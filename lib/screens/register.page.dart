@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smarket/components/custom.button.dart';
 
 class RegisterPage extends StatelessWidget {
   const RegisterPage({super.key});
@@ -79,25 +80,9 @@ class RegisterPage extends StatelessWidget {
               ],
             ),
             SizedBox(height: 8),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/home');
-              },
-              style: ElevatedButton.styleFrom(
-                minimumSize: Size(double.infinity, 60),
-                backgroundColor: Colors.blue,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-              ),
-              child: Text(
-                'Registrar',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
+            CustomButton(text: 'Registrar', onPressed: () {
+              Navigator.pushNamed(context, '/home');
+            }),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 20),
               child: Row(
@@ -145,10 +130,7 @@ class RegisterPage extends StatelessWidget {
                     // Navega para a tela de registro
                     Navigator.pushNamed(context, '/login');
                   },
-                  child: Text(
-                    'Login',
-                    style: TextStyle(color: Colors.blue),
-                  ),
+                  child: Text('Login', style: TextStyle(color: Colors.blue)),
                 ),
               ],
             ),

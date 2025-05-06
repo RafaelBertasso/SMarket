@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smarket/components/custom.button.dart';
 
 class ForgotPasswordPage extends StatelessWidget {
   const ForgotPasswordPage({super.key});
@@ -37,7 +38,10 @@ class ForgotPasswordPage extends StatelessWidget {
                   children: [
                     Text(
                       'E-mail',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                     SizedBox(height: 8),
                     TextField(
@@ -51,25 +55,7 @@ class ForgotPasswordPage extends StatelessWidget {
               ),
             ),
             Spacer(),
-            ElevatedButton(
-              onPressed: () {
-                
-              },
-              style: ElevatedButton.styleFrom(
-                minimumSize: Size(double.infinity, 60),
-                backgroundColor: Colors.blue,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-              ),
-              child: Text(
-                'Enviar código',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
+            CustomButton(text: 'Enviar código', onPressed: () {}),
           ],
         ),
       ),

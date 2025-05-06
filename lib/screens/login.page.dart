@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smarket/components/custom.button.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -78,24 +79,11 @@ class LoginPage extends StatelessWidget {
                 ),
               ],
             ),
-            ElevatedButton(
+            CustomButton(
+              text: 'Acessar',
               onPressed: () {
                 Navigator.pushNamed(context, '/home');
               },
-              child: Text(
-                'Acessar',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                minimumSize: Size(double.infinity, 60),
-                backgroundColor: Colors.blue,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-              ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 20),
