@@ -10,7 +10,7 @@ class LoginPage extends StatelessWidget {
         margin: EdgeInsets.all(30),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
-          spacing: 10,
+          spacing: 5,
           children: [
             Row(
               children: [
@@ -69,7 +69,7 @@ class LoginPage extends StatelessWidget {
               children: [
                 TextButton(
                   onPressed: () {
-                    // ação ao clicar no botão
+                    Navigator.pushNamed(context, '/forgot-password');
                   },
                   child: Text(
                     'Esqueci minha senha',
