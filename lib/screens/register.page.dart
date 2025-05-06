@@ -83,18 +83,18 @@ class RegisterPage extends StatelessWidget {
               onPressed: () {
                 Navigator.pushNamed(context, '/home');
               },
-              child: Text(
-                'Registrar',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
               style: ElevatedButton.styleFrom(
                 minimumSize: Size(double.infinity, 60),
                 backgroundColor: Colors.blue,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
+                ),
+              ),
+              child: Text(
+                'Registrar',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
