@@ -55,7 +55,9 @@ class ForgotPasswordPage extends StatelessWidget {
               ),
             ),
             Spacer(),
-            CustomButton(text: 'Enviar código', onPressed: () {}),
+            CustomButton(text: 'Enviar código', onPressed: () {
+              Navigator.pushNamed(context, '/verify');
+            }),
           ],
         ),
       ),
