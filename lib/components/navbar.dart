@@ -6,8 +6,10 @@ import 'package:smarket/screens/favorites.page.dart';
 import 'package:smarket/screens/settings.page.dart';
 
 class NavBar extends StatefulWidget {
+  const NavBar({super.key});
+
   @override
-  _NavBarState createState() => _NavBarState();
+  State<NavBar> createState() => _NavBarState();
 
   static void switchToTab(BuildContext context, int index) {
     final state = context.findAncestorStateOfType<_NavBarState>();

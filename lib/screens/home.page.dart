@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:smarket/components/navbar.dart';
 
 class HomePage extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -19,9 +19,22 @@ class HomePage extends StatelessWidget {
               children: [
                 Expanded(
                   child: Center(
-                    child: Text(
-                      'SMARKT',
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.blue),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Image.asset(
+                          'assets/images/smarket-logo.png',
+                          width: 40,
+                          height: 40,
+                        ),
+                        Text(
+                          'SMARKT',
+                          style: GoogleFonts.daysOne(
+                            fontSize: 24,
+                            color: Colors.blue,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -44,11 +57,12 @@ class HomePage extends StatelessWidget {
                       ),
                     ),
                   ],
-                )
+                ),
               ],
             ),
-            SizedBox(height: 120), // Add spacing to lower the rest of the content
-      
+            SizedBox(
+              height: 120,
+            ), // Add spacing to lower the rest of the content
             // Barra de pesquisa
             Container(
               padding: EdgeInsets.symmetric(horizontal: 16),
@@ -72,7 +86,7 @@ class HomePage extends StatelessWidget {
               ),
             ),
             SizedBox(height: 24),
-      
+
             // Categorias
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -81,14 +95,11 @@ class HomePage extends StatelessWidget {
                   'Busque por categoria',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
-                Text(
-                  'Ver tudo',
-                  style: TextStyle(color: Colors.blue),
-                )
+                Text('Ver tudo', style: TextStyle(color: Colors.blue)),
               ],
             ),
             SizedBox(height: 12),
-      
+
             SizedBox(
               height: 60,
               child: ListView(
@@ -102,7 +113,7 @@ class HomePage extends StatelessWidget {
               ),
             ),
             SizedBox(height: 24),
-      
+
             // Promoção (dois botões grandes adaptáveis)
             _buildPromoButton(context, screenWidth),
             SizedBox(height: 16),
@@ -144,16 +155,21 @@ class HomePage extends StatelessWidget {
           NavBar.switchToTab(context, 3); // Switch to the FavoritesPage tab
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.amber[700],
-          foregroundColor: Colors.white,
+          backgroundColor: Colors.transparent, // Sem cor de fundo
+          shadowColor: Colors.transparent, // Remove sombra do botão
+          padding: EdgeInsets.zero, // Remove o padding interno
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          padding: EdgeInsets.all(16),
         ),
-        child: Text(
-          'SUPER PROMOÇÃO',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Image.asset(
+            'assets/images/promo.png',
+            width: double.infinity,
+            height: double.infinity,
+            fit: BoxFit.cover,
+          ),
         ),
       ),
     );
