@@ -3,9 +3,7 @@ import 'package:smarket/screens/home.page.dart';
 import 'package:smarket/screens/location.page.dart';
 import 'package:smarket/screens/scan.page.dart';
 import 'package:smarket/screens/favorites.page.dart';
-import 'package:smarket/screens/profile.page.dart';
-
-
+import 'package:smarket/screens/settings.page.dart';
 
 class NavBar extends StatefulWidget {
   @override
@@ -25,7 +23,7 @@ class _NavBarState extends State<NavBar> {
     LocationPage(),
     ScanPage(),
     FavoritesPage(),
-    ProfilePage(),
+    SettingsPage(),
   ];
 
   void _onItemTapped(int index) {
@@ -37,10 +35,7 @@ class _NavBarState extends State<NavBar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _screens,
-      ),
+      body: IndexedStack(index: _selectedIndex, children: _screens),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: _selectedIndex,

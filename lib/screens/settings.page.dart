@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class SettingsPage extends StatelessWidget {
@@ -9,6 +8,7 @@ class SettingsPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        leading: Text(""),
         centerTitle: true, // centraliza o título
         title: const Text(
           'Meu Perfil',
@@ -75,7 +75,7 @@ class SettingsPage extends StatelessWidget {
               endIndent: 25, // margem à direita
             ),
 
-            // --- Perfil ---
+            // Perfil
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
               child: Align(
@@ -164,7 +164,7 @@ class SettingsPage extends StatelessWidget {
       builder: (BuildContext context) {
         return SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -176,7 +176,7 @@ class SettingsPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 5),
                 ListTile(
                   leading: const Icon(
                     Icons.camera_alt_outlined,
