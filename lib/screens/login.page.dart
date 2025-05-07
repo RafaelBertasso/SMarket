@@ -82,7 +82,7 @@ class LoginPage extends StatelessWidget {
             CustomButton(
               text: 'Acessar',
               onPressed: () {
-                Navigator.pushNamed(context, '/home');
+                Navigator.pushNamed(context, '/main');
               },
             ),
             Padding(
