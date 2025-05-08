@@ -87,7 +87,7 @@ class ProfilePage extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 45, vertical: 10),
       child: InkWell(
         onTap: () {
-          // Você pode colocar a navegação aqui futuramente
+          // Funcionalidade do botão
         },
         child: Row(
           children: [

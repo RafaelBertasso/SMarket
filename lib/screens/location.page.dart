@@ -12,7 +12,7 @@ class LocationPage extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pushNamed(context, '/main');
           },
           icon: const Icon(Icons.arrow_back_rounded, color: Colors.black),
         ),
@@ -24,17 +24,14 @@ class LocationPage extends StatelessWidget {
       ),
       body: Stack(
         children: [
-          // Imagem de fundo (mapa)
           SizedBox.expand(
-            child: Image.asset('assets/images/map_bg.png', fit: BoxFit.cover),
+            child: Image.asset('assets/images/map_bg.jpg', fit: BoxFit.cover),
           ),
 
-          // Conteúdo sobreposto
           SafeArea(
             child: Column(
               children: [
-                const SizedBox(height: 80), // espaço abaixo da AppBar
-                // Barra de pesquisa
+                const SizedBox(height: 80),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 30),
                   child: Container(

@@ -3,6 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:smarket/components/navbar.dart';
 
 class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -13,7 +15,6 @@ class HomePage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Logo e ícone de notificação (placeholder)
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -60,10 +61,7 @@ class HomePage extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(
-              height: 120,
-            ), // Add spacing to lower the rest of the content
-            // Barra de pesquisa
+            SizedBox(height: 120),
             Container(
               padding: EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
@@ -87,7 +85,6 @@ class HomePage extends StatelessWidget {
             ),
             SizedBox(height: 24),
 
-            // Categorias
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -114,7 +111,6 @@ class HomePage extends StatelessWidget {
             ),
             SizedBox(height: 24),
 
-            // Promoção (dois botões grandes adaptáveis)
             _buildPromoButton(context, screenWidth),
             SizedBox(height: 16),
             _buildPromoButton(context, screenWidth),
@@ -129,8 +125,7 @@ class HomePage extends StatelessWidget {
       padding: const EdgeInsets.only(right: 12),
       child: ElevatedButton(
         onPressed: () {
-          NavBar.switchToTab(context, 3); // Switch to the LocationPage tab
-          // ação da categoria
+          NavBar.switchToTab(context, 3);
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.white,
@@ -152,12 +147,12 @@ class HomePage extends StatelessWidget {
       height: 140,
       child: ElevatedButton(
         onPressed: () {
-          NavBar.switchToTab(context, 3); // Switch to the FavoritesPage tab
+          NavBar.switchToTab(context, 3);
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent, // Sem cor de fundo
-          shadowColor: Colors.transparent, // Remove sombra do botão
-          padding: EdgeInsets.zero, // Remove o padding interno
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          padding: EdgeInsets.zero,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
