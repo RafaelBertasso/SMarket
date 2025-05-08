@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class ProductInfoPage extends StatelessWidget {
+  const ProductInfoPage({super.key, required this.productId});
+  
   final int productId;
-
-  ProductInfoPage({required this.productId});
 
   @override
   Widget build(BuildContext context) {
@@ -27,9 +27,7 @@ class ProductInfoPage extends StatelessWidget {
               padding: EdgeInsets.all(16.0),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(16.0),
-                ),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.grey.withOpacity(0.5),
@@ -44,10 +42,7 @@ class ProductInfoPage extends StatelessWidget {
                 children: [
                   Text(
                     'Product $productId',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 16.0),
                   Text(
@@ -63,4 +58,3 @@ class ProductInfoPage extends StatelessWidget {
     );
   }
 }
-
