@@ -10,12 +10,7 @@ class LocationPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(Icons.arrow_back_rounded, color: Colors.black),
-        ),
+        leading: Text(""),
         title: Text(
           'Encontre mercados próximos',
           style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600),
@@ -54,7 +49,7 @@ class LocationPage extends StatelessWidget {
                               hintText: 'Pesquisar...',
                               hintStyle: GoogleFonts.inter(
                                 fontSize: 14,
-                                fontWeight: FontWeight.w500,
+                                fontWeight: FontWeight.w400,
                                 color: Colors.black26,
                               ),
                               border: InputBorder.none,
