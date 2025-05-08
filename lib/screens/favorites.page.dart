@@ -10,7 +10,7 @@ class FavoritesPage extends StatelessWidget {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            NavBar.switchToTab(context, 0); // Navigate back to HomePage
+            NavBar.switchToTab(context, 0);
           },
         ),
         title: Row(
@@ -42,7 +42,7 @@ class FavoritesPage extends StatelessWidget {
         ),
       ),
       body: ListView.builder(
-        itemCount: 10, // Example: 10 products
+        itemCount: 10,
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () {
@@ -62,7 +62,7 @@ class FavoritesPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8.0),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
+                    color: const Color.fromARGB(127, 158, 158, 158),
                     spreadRadius: 2,
                     blurRadius: 5,
                     offset: Offset(0, 3),
