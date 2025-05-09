@@ -80,9 +80,12 @@ class RegisterPage extends StatelessWidget {
               ],
             ),
             SizedBox(height: 8),
-            CustomButton(text: 'Registrar', onPressed: () {
-              Navigator.pushNamed(context, '/home');
-            }),
+            CustomButton(
+              text: 'Registrar',
+              onPressed: () {
+                Navigator.pushNamed(context, '/home');
+              },
+            ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 20),
               child: Row(
@@ -104,7 +107,7 @@ class RegisterPage extends StatelessWidget {
                 // Ação ao clicar no botão do Google
               },
               icon: Image.asset(
-                'assets/images/google_icon.png', // Certifique-se de ter esse ícone no projeto
+                'assets/images/google_icon.png',
                 height: 24,
                 width: 24,
               ),
@@ -127,7 +130,6 @@ class RegisterPage extends StatelessWidget {
                 Text('Já possui uma conta?'),
                 TextButton(
                   onPressed: () {
-                    // Navega para a tela de registro
                     Navigator.pushNamed(context, '/login');
                   },
                   child: Text('Login', style: TextStyle(color: Colors.blue)),

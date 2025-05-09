@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smarket/components/navbar.dart';
 import 'package:smarket/screens/favorites.page.dart';
+import 'package:smarket/screens/change.password.page.dart';
 import 'package:smarket/screens/forgot.password.page.dart';
 import 'package:smarket/screens/login.page.dart';
 import 'package:smarket/screens/register.page.dart';
@@ -24,6 +25,7 @@ class SMarketApp extends StatelessWidget {
         '/profile': (context) => const ProfilePage(),
         '/location': (context) => const LocationPage(),
         '/favorites': (context) => const FavoritesPage(),
+        '/reset': (context) => const ChangePasswordPage()
       },
       initialRoute: '/login',
       debugShowCheckedModeBanner: false,

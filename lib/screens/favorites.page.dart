@@ -11,7 +11,7 @@ class FavoritesPage extends StatelessWidget {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pushNamed(context, '/main'); // Navigate back to HomePage
+            Navigator.pushNamed(context, '/main'); 
           },
         ),
         title: Container(
@@ -42,7 +42,7 @@ class FavoritesPage extends StatelessWidget {
       ),
 
       body: ListView.builder(
-        itemCount: 10, // Example: 10 products
+        itemCount: 10,
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () {

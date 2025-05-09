@@ -19,17 +19,14 @@ class LocationPage extends StatelessWidget {
       ),
       body: Stack(
         children: [
-          // Imagem de fundo (mapa)
           SizedBox.expand(
             child: Image.asset('assets/images/map_bg.jpg', fit: BoxFit.cover),
           ),
 
-          // Conteúdo sobreposto
           SafeArea(
             child: Column(
               children: [
-                const SizedBox(height: 80), // espaço abaixo da AppBar
-                // Barra de pesquisa
+                const SizedBox(height: 80),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 30),
                   child: Container(

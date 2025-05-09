@@ -35,10 +35,9 @@ class _SettingsPageState extends State<SettingsPage> {
               children: [
                 // Foto do usuário
                 Container(
-                  padding: const EdgeInsets.all(2), // Espessura da borda
+                  padding: const EdgeInsets.all(2),
                   child: const CircleAvatar(radius: 50),
                 ),
-                // Bolinha do ícone de câmera como botão
                 Positioned(
                   bottom: 2,
                   right: 2,
@@ -85,8 +84,8 @@ class _SettingsPageState extends State<SettingsPage> {
             Divider(
               color: const Color.fromRGBO(237, 237, 237, 1),
               thickness: 2,
-              indent: 25, // margem à esquerda
-              endIndent: 25, // margem à direita
+              indent: 25,
+              endIndent: 25,
             ),
 
             // Configurações

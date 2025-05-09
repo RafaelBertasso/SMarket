@@ -3,6 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:smarket/components/navbar.dart';
 
 class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -14,7 +16,6 @@ class HomePage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Logo e ícone de notificação
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -63,7 +64,6 @@ class HomePage extends StatelessWidget {
             ),
             SizedBox(height: 24),
 
-            // Barra de pesquisa
             Container(
               padding: EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
@@ -88,7 +88,6 @@ class HomePage extends StatelessWidget {
             ),
             SizedBox(height: 24),
 
-            // Categorias
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
