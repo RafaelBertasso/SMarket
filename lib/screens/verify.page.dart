@@ -78,13 +78,25 @@ class _VerifyPageState extends State<VerifyPage> {
                         textAlign: TextAlign.center,
                         maxLength: 1,
                         onChanged: (value) {
-                          if (value.isNotEmpty && index < 3) {
-                            _focusNodes[index + 1].requestFocus();
-                          }
-                          if (value.isEmpty && index > 0) {
+                          if (value.isNotEmpty) {
+                            if (index < 3) {
+                              _focusNodes[index + 1].requestFocus();
+                            } else {
+                              final code =
+                                  _controllers.map((e) => e.text).join();
+                              if (code.length == 4) {
+                                // Aqui você pode adicionar a lógica para verificar o código
+
+                                Future.delayed(Duration(milliseconds: 100), () {
+                                  Navigator.pushNamed(context, '/reset');
+                                });
+                              }
+                            }
+                          } else if (index > 0) {
                             _focusNodes[index - 1].requestFocus();
                           }
                         },
+
                         decoration: InputDecoration(
                           counterText: '',
                           border: OutlineInputBorder(),

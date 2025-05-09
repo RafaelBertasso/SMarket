@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:smarket/components/custom.button.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});

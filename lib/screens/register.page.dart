@@ -83,7 +83,7 @@ class RegisterPage extends StatelessWidget {
             CustomButton(
               text: 'Registrar',
               onPressed: () {
-                Navigator.pushNamed(context, '/home');
+                Navigator.pushNamed(context, '/main');
               },
             ),
             Padding(
