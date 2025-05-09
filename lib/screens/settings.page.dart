@@ -19,7 +19,8 @@ class _SettingsPageState extends State<SettingsPage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         leading: Text(""),
-        centerTitle: true,
+        backgroundColor: Colors.white,
+        centerTitle: true, // centraliza o título
         title: Text(
           'Meu Perfil',
           style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600),
