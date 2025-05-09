@@ -21,7 +21,7 @@ class LocationPage extends StatelessWidget {
         children: [
           // Imagem de fundo (mapa)
           SizedBox.expand(
-            child: Image.asset('assets/images/map_bg.png', fit: BoxFit.cover),
+            child: Image.asset('assets/images/map_bg.jpg', fit: BoxFit.cover),
           ),
 
           // Conteúdo sobreposto

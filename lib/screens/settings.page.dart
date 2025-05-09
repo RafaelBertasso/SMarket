@@ -19,6 +19,7 @@ class _SettingsPageState extends State<SettingsPage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         leading: Text(""),
+        backgroundColor: Colors.white,
         centerTitle: true, // centraliza o título
         title: Text(
           'Meu Perfil',
@@ -206,10 +207,7 @@ class _SettingsPageState extends State<SettingsPage> {
       child: InkWell(
         hoverColor: Colors.white,
         onTap: () {
-          Navigator.pushNamed(
-            context,
-            routeName,
-          ); // agora usa o routeName corretamente
+          Navigator.pushNamed(context, routeName);
         },
         child: Row(
           children: [

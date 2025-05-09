@@ -8,12 +8,13 @@ class HomePage extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
+      backgroundColor: Color.fromRGBO(211, 233, 248, 1),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+        padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Logo e ícone de notificação (placeholder)
+            // Logo e ícone de notificação
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -60,14 +61,13 @@ class HomePage extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(
-              height: 120,
-            ), // Add spacing to lower the rest of the content
+            SizedBox(height: 24),
+
             // Barra de pesquisa
             Container(
               padding: EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
-                color: Colors.grey[200],
+                color: const Color.fromARGB(255, 248, 248, 248),
                 borderRadius: BorderRadius.circular(30),
               ),
               child: Row(
@@ -76,6 +76,7 @@ class HomePage extends StatelessWidget {
                   SizedBox(width: 8),
                   Expanded(
                     child: TextField(
+                      style: GoogleFonts.inter(),
                       decoration: InputDecoration(
                         hintText: 'Pesquisar Produtos',
                         border: InputBorder.none,
@@ -93,55 +94,111 @@ class HomePage extends StatelessWidget {
               children: [
                 Text(
                   'Busque por categoria',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                Text('Ver tudo', style: TextStyle(color: Colors.blue)),
+                // Text('Ver tudo', style: GoogleFonts.inter(color: Colors.blue)),
               ],
             ),
             SizedBox(height: 12),
 
             SizedBox(
-              height: 60,
+              height: 90,
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 children: [
-                  _buildCategoryButton(context, 'Limpeza'),
-                  _buildCategoryButton(context, 'Legumes'),
-                  _buildCategoryButton(context, 'Bebidas'),
-                  _buildCategoryButton(context, 'Pet'),
+                  _buildCategoryButton(
+                    context,
+                    Icons.cleaning_services_rounded,
+                    'Limpeza',
+                    '/favorites',
+                  ),
+                  _buildCategoryButton(
+                    context,
+                    Icons.local_florist,
+                    'Legumes',
+                    '/favorites',
+                  ),
+                  _buildCategoryButton(
+                    context,
+                    Icons.wine_bar_rounded,
+                    'Bebidas',
+                    '/favorites',
+                  ),
+                  _buildCategoryButton(
+                    context,
+                    Icons.pets_rounded,
+                    'Pet',
+                    '/favorites',
+                  ),
                 ],
               ),
             ),
             SizedBox(height: 24),
 
-            // Promoção (dois botões grandes adaptáveis)
-            _buildPromoButton(context, screenWidth),
-            SizedBox(height: 16),
-            _buildPromoButton(context, screenWidth),
+            // Container branco com sombra
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color.fromARGB(22, 0, 0, 0),
+                    blurRadius: 10,
+                    offset: Offset(0, -4),
+                  ),
+                ],
+              ),
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  _buildPromoButton(context, screenWidth),
+                  SizedBox(height: 16),
+                  _buildPromoButton(context, screenWidth),
+                ],
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildCategoryButton(BuildContext context, String label) {
+  Widget _buildCategoryButton(
+    BuildContext context,
+    IconData icon,
+    String label,
+    String route,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(right: 12),
-      child: ElevatedButton(
-        onPressed: () {
-          NavBar.switchToTab(context, 3); // Switch to the LocationPage tab
-          // ação da categoria
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
-          padding: EdgeInsets.symmetric(horizontal: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+      child: Column(
+        children: [
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pushNamed(context, route);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.black,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              elevation: 2,
+              minimumSize: Size(70, 70),
+              padding: EdgeInsets.zero,
+            ),
+            child: Icon(icon, size: 28),
           ),
-          elevation: 2,
-        ),
-        child: Text(label),
+          SizedBox(height: 4),
+          Text(
+            label,
+            style: GoogleFonts.inter(fontSize: 12),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }
@@ -149,15 +206,15 @@ class HomePage extends StatelessWidget {
   Widget _buildPromoButton(BuildContext context, double screenWidth) {
     return SizedBox(
       width: screenWidth,
-      height: 140,
+      height: 150,
       child: ElevatedButton(
         onPressed: () {
-          NavBar.switchToTab(context, 3); // Switch to the FavoritesPage tab
+          Navigator.pushNamed(context, '/favorites');
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent, // Sem cor de fundo
-          shadowColor: Colors.transparent, // Remove sombra do botão
-          padding: EdgeInsets.zero, // Remove o padding interno
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          padding: EdgeInsets.zero,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -166,9 +223,9 @@ class HomePage extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           child: Image.asset(
             'assets/images/promo.png',
-            width: double.infinity,
-            height: double.infinity,
-            fit: BoxFit.cover,
+            width: screenWidth,
+            height: 150,
+            fit: BoxFit.contain,
           ),
         ),
       ),
