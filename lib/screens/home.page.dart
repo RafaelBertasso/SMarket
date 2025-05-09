@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:smarket/components/navbar.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -98,15 +97,14 @@ class HomePage extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                // Text('Ver tudo', style: GoogleFonts.inter(color: Colors.blue)),
               ],
             ),
             SizedBox(height: 12),
 
             SizedBox(
               height: 90,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   _buildCategoryButton(
                     context,
@@ -137,7 +135,6 @@ class HomePage extends StatelessWidget {
             ),
             SizedBox(height: 24),
 
-            // Container branco com sombra
             Container(
               decoration: BoxDecoration(
                 color: Colors.white,
