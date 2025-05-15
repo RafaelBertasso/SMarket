@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:smarket/components/custom.button.dart';
 
 class RegisterPage extends StatelessWidget {
@@ -32,6 +33,31 @@ class RegisterPage extends StatelessWidget {
     } on FirebaseAuthException catch (e) {
       final snackBar = SnackBar(
         content: Text('Erro ao criar conta: ${e.message}'),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+  }
+
+  Future<void> _loginWithGoogle(BuildContext context) async {
+    try {
+      final GoogleSignInAccount? googleuser = await GoogleSignIn().signIn();
+      if (googleuser == null) {
+        return;
+      }
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleuser.authentication;
+
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+      await _auth.signInWithCredential(credential);
+      Navigator.pushReplacementNamed(context, '/main');
+
+    } on FirebaseAuthException catch (e) {
+      final snackBar = SnackBar(
+        content: Text('Erro ao fazer login: ${e.message}'),
       );
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
@@ -172,7 +198,7 @@ class RegisterPage extends StatelessWidget {
                 ),
                 OutlinedButton.icon(
                   onPressed: () {
-                    // Ação ao clicar no botão do Google
+                    _loginWithGoogle(context);
                   },
                   icon: Image.asset(
                     'assets/images/google_icon.png',
