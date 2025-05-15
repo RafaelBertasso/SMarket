@@ -1,8 +1,39 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:smarket/components/custom.button.dart';
 
 class ForgotPasswordPage extends StatelessWidget {
-  const ForgotPasswordPage({super.key});
+  ForgotPasswordPage({super.key});
+
+  final txtEmail = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  Future<void> _resetPassword(BuildContext context) async {
+    final email = txtEmail.text.trim();
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Insira um e-mail válido')));
+      return;
+    }
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'E-mail de recuperação enviado! Verifique sua caixa de entrada',
+          ),
+        ),
+      );
+      Navigator.pushReplacementNamed(context, '/reset');
+    } on FirebaseAuthException catch (e) {
+      final snackBar = SnackBar(
+        content: Text('Erro ao enviar e-mail: ${e.message}'),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +76,8 @@ class ForgotPasswordPage extends StatelessWidget {
                     ),
                     SizedBox(height: 8),
                     TextField(
+                      controller: txtEmail,
+                      keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(),
                         hintText: 'E-mail',
@@ -55,9 +88,12 @@ class ForgotPasswordPage extends StatelessWidget {
               ),
             ),
             Spacer(),
-            CustomButton(text: 'Enviar código', onPressed: () {
-              Navigator.pushNamed(context, '/verify');
-            }),
+            CustomButton(
+              text: 'Enviar código',
+              onPressed: () {
+                _resetPassword(context);
+              },
+            ),
           ],
         ),
       ),
