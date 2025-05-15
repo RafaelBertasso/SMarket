@@ -43,7 +43,6 @@ class LoginPage extends StatelessWidget {
       );
       await _auth.signInWithCredential(credential);
       Navigator.pushReplacementNamed(context, '/main');
-
     } on FirebaseAuthException catch (e) {
       final snackBar = SnackBar(
         content: Text('Erro ao fazer login: ${e.message}'),
