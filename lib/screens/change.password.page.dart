@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:smarket/components/custom.button.dart';
 
 class ChangePasswordPage extends StatelessWidget {
-  const ChangePasswordPage({super.key});
+  ChangePasswordPage({super.key});
+
+  final ValueNotifier<bool> _obscurePasswordUp = ValueNotifier(true);
+  final ValueNotifier<bool> _obscurePasswordDown = ValueNotifier(true);
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +40,7 @@ class ChangePasswordPage extends StatelessWidget {
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'Digite sua nova senha',
+                  'Atualize sua senha',
                   style: TextStyle(color: Colors.grey),
                 ),
               ),
@@ -56,16 +59,28 @@ class ChangePasswordPage extends StatelessWidget {
                         ),
                       ),
                     ),
-                    SizedBox(height: 8),
-                    TextField(
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        hintText: 'Senha',
-                        suffixIcon: Icon(Icons.visibility_off),
-                        counterText:
-                            'A senha deve conter no mínimo 8 caracteres',
-                      ),
+                    ValueListenableBuilder(
+                      valueListenable: _obscurePasswordUp,
+                      builder: (builder, value, child) {
+                        return TextField(
+                          obscureText: value,
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            hintText: 'Senha',
+                            counterText:
+                                'A senha deve conter no mínimo 8 caracteres',
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                value ? Icons.visibility_off : Icons.visibility,
+                              ),
+                              onPressed: () {
+                                _obscurePasswordUp.value =
+                                    !_obscurePasswordUp.value;
+                              },
+                            ),
+                          ),
+                        );
+                      },
                     ),
                     SizedBox(height: 30),
                     Align(
@@ -78,17 +93,28 @@ class ChangePasswordPage extends StatelessWidget {
                         ),
                       ),
                     ),
-                    SizedBox(height: 8),
-                    TextField(
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        hintText: 'Senha',
-                        suffixIcon: Icon(Icons.visibility_off),
-                        counterText: 'As senhas devem ser iguais',
-                      ),
-                    ),
-                  ],
+                    ValueListenableBuilder(
+                      valueListenable: _obscurePasswordDown,
+                      builder: (builder, value, child) {
+                        return TextField(
+                          obscureText: value,
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            hintText: 'Senha',
+                            counterText: 'As senhas devem ser iguais',
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                value ? Icons.visibility_off : Icons.visibility,
+                              ),
+                              onPressed: () {
+                                _obscurePasswordDown.value =
+                                    !_obscurePasswordDown.value;
+                              },
+                            ),
+                          ),
+                        );
+                      },
+                    ),],
                 ),
               ),
               CustomButton(
