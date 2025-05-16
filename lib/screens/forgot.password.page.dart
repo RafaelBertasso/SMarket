@@ -26,10 +26,10 @@ class ForgotPasswordPage extends StatelessWidget {
           ),
         ),
       );
-      Navigator.pushReplacementNamed(context, '/reset');
+      Navigator.pushReplacementNamed(context, '/login');
     } on FirebaseAuthException catch (e) {
       final snackBar = SnackBar(
-        content: Text('Erro ao enviar e-mail: ${e.message}'),
+        content: Text('Erro ao enviar e-mail'),
       );
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
