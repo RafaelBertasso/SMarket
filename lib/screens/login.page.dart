@@ -12,6 +12,11 @@ class LoginPage extends StatelessWidget {
   final ValueNotifier<bool> _obscurePassword = ValueNotifier(true);
 
   Future<void> _login(BuildContext context) async {
+    if (txtEmail.text.isEmpty || txtPassword.text.isEmpty) {
+      final snackBar = SnackBar(content: Text('Preencha todos os campos'));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      return;
+    }
     try {
       UserCredential credential = await _auth.signInWithEmailAndPassword(
         email: txtEmail.text,
@@ -21,7 +26,7 @@ class LoginPage extends StatelessWidget {
       Navigator.pushReplacementNamed(context, '/main');
     } on FirebaseAuthException catch (e) {
       final snackBar = SnackBar(
-        content: Text('Erro ao fazer login: ${e.message}'),
+        content: Text('Usuário ou senha inválidos'),
       );
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
