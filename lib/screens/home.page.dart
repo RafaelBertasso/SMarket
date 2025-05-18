@@ -9,139 +9,152 @@ class HomePage extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: Color.fromRGBO(211, 233, 248, 1),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      backgroundColor: const Color.fromRGBO(211, 233, 248, 1),
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(25, 24, 25, 200),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Center(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Image.asset(
-                          'assets/images/smarket-logo.png',
-                          width: 40,
-                          height: 40,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Center(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Image.asset(
+                              'assets/images/smarket-logo.png',
+                              width: 40,
+                              height: 40,
+                            ),
+                            Text(
+                              'SMARKT',
+                              style: GoogleFonts.daysOne(
+                                fontSize: 24,
+                                color: Colors.blue,
+                              ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          'SMARKT',
-                          style: GoogleFonts.daysOne(
-                            fontSize: 24,
-                            color: Colors.blue,
+                      ),
+                    ),
+                    Stack(
+                      children: [
+                        const Icon(Icons.notifications_none, size: 28),
+                        Positioned(
+                          right: 0,
+                          top: 0,
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: const BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Text(
+                              '1',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                              ),
+                            ),
                           ),
                         ),
                       ],
                     ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+
+                // Campo de busca
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 248, 248, 248),
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.search, color: Colors.grey),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: TextField(
+                          style: GoogleFonts.inter(),
+                          decoration: const InputDecoration(
+                            hintText: 'Pesquisar Produtos',
+                            border: InputBorder.none,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                Stack(
+                const SizedBox(height: 24),
+
+                // Título
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Icon(Icons.notifications_none, size: 28),
-                    Positioned(
-                      right: 0,
-                      top: 0,
-                      child: Container(
-                        padding: EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Text(
-                          '1',
-                          style: TextStyle(color: Colors.white, fontSize: 10),
-                        ),
+                    Text(
+                      'Busque por categoria',
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],
                 ),
-              ],
-            ),
-            SizedBox(height: 24),
+                const SizedBox(height: 12),
 
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 248, 248, 248),
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.search, color: Colors.grey),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: TextField(
-                      style: GoogleFonts.inter(),
-                      decoration: InputDecoration(
-                        hintText: 'Pesquisar Produtos',
-                        border: InputBorder.none,
+                // Categorias
+                SizedBox(
+                  height: 90,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    children: [
+                      _buildCategoryButton(
+                        context,
+                        Icons.cleaning_services_rounded,
+                        'Limpeza',
+                        '/favorites',
                       ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 24),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Busque por categoria',
-                  style: GoogleFonts.inter(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                      _buildCategoryButton(
+                        context,
+                        Icons.local_florist,
+                        'Legumes',
+                        '/favorites',
+                      ),
+                      _buildCategoryButton(
+                        context,
+                        Icons.wine_bar_rounded,
+                        'Bebidas',
+                        '/favorites',
+                      ),
+                      _buildCategoryButton(
+                        context,
+                        Icons.pets_rounded,
+                        'Pet',
+                        '/favorites',
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 12),
+          ),
 
-            SizedBox(
-              height: 90,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildCategoryButton(
-                    context,
-                    Icons.cleaning_services_rounded,
-                    'Limpeza',
-                    '/favorites',
-                  ),
-                  _buildCategoryButton(
-                    context,
-                    Icons.local_florist,
-                    'Legumes',
-                    '/favorites',
-                  ),
-                  _buildCategoryButton(
-                    context,
-                    Icons.wine_bar_rounded,
-                    'Bebidas',
-                    '/favorites',
-                  ),
-                  _buildCategoryButton(
-                    context,
-                    Icons.pets_rounded,
-                    'Pet',
-                    '/favorites',
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 24),
-
-            Container(
-              decoration: BoxDecoration(
+          // Container branco fixo no rodapé
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color.fromARGB(22, 0, 0, 0),
+                    color: Color.fromARGB(22, 0, 0, 0),
                     blurRadius: 10,
                     offset: Offset(0, -4),
                   ),
@@ -149,15 +162,16 @@ class HomePage extends StatelessWidget {
               ),
               padding: const EdgeInsets.all(16),
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   _buildPromoButton(context, screenWidth),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   _buildPromoButton(context, screenWidth),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -169,7 +183,7 @@ class HomePage extends StatelessWidget {
     String route,
   ) {
     return Padding(
-      padding: const EdgeInsets.only(right: 12),
+      padding: const EdgeInsets.only(right: 20),
       child: Column(
         children: [
           ElevatedButton(
@@ -183,12 +197,12 @@ class HomePage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
               ),
               elevation: 2,
-              minimumSize: Size(70, 70),
+              minimumSize: const Size(70, 70),
               padding: EdgeInsets.zero,
             ),
             child: Icon(icon, size: 28),
           ),
-          SizedBox(height: 4),
+          const SizedBox(height: 4),
           Text(
             label,
             style: GoogleFonts.inter(fontSize: 12),
