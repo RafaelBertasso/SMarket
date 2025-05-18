@@ -84,13 +84,13 @@ class _SettingsPageState extends State<SettingsPage> {
             Divider(
               color: const Color.fromRGBO(237, 237, 237, 1),
               thickness: 2,
-              indent: 25,
-              endIndent: 25,
+              indent: 20,
+              endIndent: 20,
             ),
 
             // Configurações
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
@@ -135,7 +135,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
 
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
@@ -163,7 +163,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
 
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
               child: OutlinedButton(
                 style: OutlinedButton.styleFrom(
                   side: BorderSide(color: Colors.grey[300]!),
@@ -202,7 +202,7 @@ class _SettingsPageState extends State<SettingsPage> {
     String routeName,
   ) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 45, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
       child: InkWell(
         hoverColor: Colors.white,
         onTap: () {
@@ -239,7 +239,7 @@ class _SettingsPageState extends State<SettingsPage> {
     ValueChanged<bool> onChanged,
   ) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 45, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
       child: Row(
         children: [
           CircleAvatar(
