@@ -43,6 +43,9 @@ class _NavBarState extends State<NavBar> {
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         selectedItemColor: Colors.blue,
+        showSelectedLabels: false,
+        showUnselectedLabels: false,
+
         items: [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
           BottomNavigationBarItem(icon: Icon(Icons.location_on), label: ''),
@@ -53,7 +56,7 @@ class _NavBarState extends State<NavBar> {
             ),
             label: '',
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: ''),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
         ],
       ),
