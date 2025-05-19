@@ -1,8 +1,22 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  User? user;
+
+  @override
+  void initState() {
+    super.initState();
+    user = FirebaseAuth.instance.currentUser;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +40,27 @@ class ProfilePage extends StatelessWidget {
         elevation: 0,
       ),
 
-      body: SingleChildScrollView(child: Text('dados do usuário')),
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: user == null
+            ? const Center(child: Text('Usuário não encontrado.'))
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Nome:',
+                    style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+                  ),
+                  Text(user!.displayName ?? 'Sem nome cadastrado'),
+                  SizedBox(height: 20),
+                  Text(
+                    'E-mail:',
+                    style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+                  ),
+                  Text(user!.email ?? 'Sem e-mail'),
+                ],
+              ),
+      ),
     );
   }
 }

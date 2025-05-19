@@ -1,8 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class SettingsPage extends StatefulWidget {
-  const SettingsPage({super.key});
+  SettingsPage({super.key});
 
   @override
   State<SettingsPage> createState() => _SettingsPageState();
@@ -12,6 +14,8 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _cameraEnabled = false;
   bool _locationEnabled = false;
   bool _notificationsEnabled = false;
+
+  final user = FirebaseAuth.instance.currentUser;
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +54,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             const SizedBox(height: 12),
             Text(
-              'Fulano de Tal',
+              user?.displayName ?? 'Nome não cadastrado',
               style: GoogleFonts.inter(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -58,7 +62,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             const SizedBox(height: 4),
             Text(
-              'otalfulano@gmail.com',
+              user?.email ?? 'E-mail não cadastrado',
               style: GoogleFonts.inter(fontSize: 14, color: Colors.grey[600]),
             ),
             const SizedBox(height: 15),
