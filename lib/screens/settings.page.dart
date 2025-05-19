@@ -30,37 +30,19 @@ class _SettingsPageState extends State<SettingsPage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
             Stack(
               children: [
                 // Foto do usuário
                 Container(
                   padding: const EdgeInsets.all(2),
-                  child: const CircleAvatar(radius: 50),
-                ),
-                Positioned(
-                  bottom: 2,
-                  right: 2,
-                  child: MouseRegion(
-                    cursor: SystemMouseCursors.click,
-                    child: GestureDetector(
-                      onTap: () => _showPhotoOptions(context),
-                      child: Container(
-                        padding: const EdgeInsets.all(2),
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const CircleAvatar(
-                          radius: 15,
-                          backgroundColor: Color.fromRGBO(245, 245, 255, 1),
-                          child: Icon(
-                            Icons.camera_alt_rounded,
-                            size: 18,
-                            color: Color.fromRGBO(28, 154, 234, 1),
-                          ),
-                        ),
-                      ),
+                  child: const CircleAvatar(
+                    radius: 50,
+                    backgroundColor: Color.fromRGBO(211, 233, 248, 1),
+                    child: Icon(
+                      Icons.person_rounded,
+                      color: Colors.white,
+                      size: 53.5,
                     ),
                   ),
                 ),
@@ -267,58 +249,6 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ],
       ),
-    );
-  }
-
-  void _showPhotoOptions(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (BuildContext context) {
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 40,
-                  height: 3,
-                  decoration: BoxDecoration(
-                    color: Color.fromRGBO(245, 245, 255, 1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                const SizedBox(height: 3),
-                ListTile(
-                  leading: const Icon(
-                    Icons.camera_alt_outlined,
-                    color: Colors.blue,
-                  ),
-                  title: const Text('Tirar foto'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    // lógica da câmera aqui
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(
-                    Icons.photo_library_outlined,
-                    color: Colors.blue,
-                  ),
-                  title: const Text('Escolher da galeria'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    // lógica da galeria aqui
-                  },
-                ),
-              ],
-            ),
-          ),
-        );
-      },
     );
   }
 }
