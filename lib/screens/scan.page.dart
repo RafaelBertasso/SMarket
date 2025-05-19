@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -86,20 +85,12 @@ class _ScanPageState extends State<ScanPage> {
         color: Colors.grey[900],
         child: Center(child: _arquivoWidget()),
       ),
-      // floatingActionButton:
-      //     (photo != null)
-      //         ? FloatingActionButton.extended(
-      //           onPressed: () => Navigator.pop(context),
-      //           label: const Text("Finalizar"),
-      //         )
-      //         : null,
-      // floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 
   Widget _arquivoWidget() {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center, //alterar altura da camera
       children: [
         Container(
           width: size!.width - 50,
@@ -118,9 +109,9 @@ class _ScanPageState extends State<ScanPage> {
                 ElevatedButton.icon(
                   onPressed: refazerFoto,
                   icon: const Icon(Icons.refresh),
-                  label: const Text(
+                  label: Text(
                     'Refazer Foto',
-                    style: TextStyle(fontSize: 14),
+                    style: GoogleFonts.inter(fontSize: 14),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.redAccent,
@@ -138,9 +129,9 @@ class _ScanPageState extends State<ScanPage> {
                 ElevatedButton.icon(
                   onPressed: () => Navigator.pop(context),
                   icon: const Icon(Icons.check_circle),
-                  label: const Text(
+                  label: Text(
                     'Finalizar',
-                    style: TextStyle(fontSize: 14),
+                    style: GoogleFonts.inter(fontSize: 14),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
@@ -163,9 +154,9 @@ class _ScanPageState extends State<ScanPage> {
 
   Widget _cameraPreviewWidget() {
     if (cameraController == null || !cameraController!.value.isInitialized) {
-      return const Text(
+      return Text(
         'Câmera não disponível',
-        style: TextStyle(color: Colors.white),
+        style: GoogleFonts.inter(color: Colors.white),
       );
     } else {
       return Stack(

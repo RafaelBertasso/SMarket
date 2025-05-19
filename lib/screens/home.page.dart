@@ -13,7 +13,7 @@ class HomePage extends StatelessWidget {
       body: Stack(
         children: [
           SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(25, 24, 25, 200),
+            padding: const EdgeInsets.fromLTRB(25, 30, 25, 200),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -40,29 +40,6 @@ class HomePage extends StatelessWidget {
                           ],
                         ),
                       ),
-                    ),
-                    Stack(
-                      children: [
-                        const Icon(Icons.notifications_none, size: 28),
-                        Positioned(
-                          right: 0,
-                          top: 0,
-                          child: Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: const BoxDecoration(
-                              color: Colors.red,
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Text(
-                              '1',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 10,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
                     ),
                   ],
                 ),
@@ -106,7 +83,7 @@ class HomePage extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 15),
 
                 // Categorias
                 SizedBox(
@@ -116,14 +93,8 @@ class HomePage extends StatelessWidget {
                     children: [
                       _buildCategoryButton(
                         context,
-                        Icons.cleaning_services_rounded,
-                        'Limpeza',
-                        '/favorites',
-                      ),
-                      _buildCategoryButton(
-                        context,
-                        Icons.local_florist,
-                        'Legumes',
+                        Icons.kebab_dining_rounded,
+                        'Açougue',
                         '/favorites',
                       ),
                       _buildCategoryButton(
@@ -134,7 +105,31 @@ class HomePage extends StatelessWidget {
                       ),
                       _buildCategoryButton(
                         context,
-                        Icons.pets_rounded,
+                        Icons.local_florist,
+                        'Feirinha',
+                        '/favorites',
+                      ),
+                      _buildCategoryButton(
+                        context,
+                        Icons.clean_hands,
+                        'Higiene',
+                        '/favorites',
+                      ),
+                      _buildCategoryButton(
+                        context,
+                        Icons.cleaning_services,
+                        'Limpeza',
+                        '/favorites',
+                      ),
+                      _buildCategoryButton(
+                        context,
+                        Icons.dinner_dining_rounded,
+                        'Massas',
+                        '/favorites',
+                      ),
+                      _buildCategoryButton(
+                        context,
+                        Icons.pets,
                         'Pet',
                         '/favorites',
                       ),
@@ -184,31 +179,37 @@ class HomePage extends StatelessWidget {
   ) {
     return Padding(
       padding: const EdgeInsets.only(right: 20),
-      child: Column(
-        children: [
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pushNamed(context, route);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.black,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+      child: SizedBox(
+        width: 70,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, route);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.black,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                elevation: 2,
+                minimumSize: const Size(70, 70),
+                padding: EdgeInsets.zero,
               ),
-              elevation: 2,
-              minimumSize: const Size(70, 70),
-              padding: EdgeInsets.zero,
+              child: Icon(icon, size: 28),
             ),
-            child: Icon(icon, size: 28),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: GoogleFonts.inter(fontSize: 12),
-            textAlign: TextAlign.center,
-          ),
-        ],
+            const SizedBox(height: 5),
+            Text(
+              label,
+              style: GoogleFonts.inter(fontSize: 12),
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+          ],
+        ),
       ),
     );
   }

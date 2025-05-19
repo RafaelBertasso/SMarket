@@ -109,16 +109,6 @@ class _SettingsPageState extends State<SettingsPage> {
                 });
               },
             ),
-            _buildToggleItem(
-              Icons.notifications_none_outlined,
-              'Permitir o Envio de Notificações',
-              _notificationsEnabled,
-              (value) {
-                setState(() {
-                  _notificationsEnabled = value;
-                });
-              },
-            ),
 
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
@@ -225,7 +215,7 @@ class _SettingsPageState extends State<SettingsPage> {
     ValueChanged<bool> onChanged,
   ) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+      padding: const EdgeInsets.fromLTRB(30, 10, 20, 10),
       child: Row(
         children: [
           CircleAvatar(
