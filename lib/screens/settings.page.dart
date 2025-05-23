@@ -13,9 +13,51 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   bool _cameraEnabled = false;
   bool _locationEnabled = false;
-  bool _notificationsEnabled = false;
+  final _notificationsEnabled = false;
 
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   final user = FirebaseAuth.instance.currentUser;
+
+  void _deleteAccount() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: Text('Confirmar exclusão'),
+            content: Text('Tem certeza que deseja excluir sua conta?'),
+            actions: [
+              TextButton(
+                child: Text('Cancelar'),
+                onPressed: () => Navigator.pop(context, false),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: Text('Deletar', style: TextStyle(color: Colors.red)),
+              ),
+            ],
+          ),
+    );
+
+    if (confirm == true) {
+      try {
+        await user?.delete();
+        await _auth.signOut();
+        Navigator.pushNamedAndRemoveUntil(context, '/login', (_) => false);
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'requires-recent-login') {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Faça login novamente para excluir sua conta'),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Erro ao excluir conta: ${e.message}')),
+          );
+        }
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +66,7 @@ class _SettingsPageState extends State<SettingsPage> {
       appBar: AppBar(
         leading: Text(""),
         backgroundColor: Colors.white,
-        centerTitle: true, // centraliza o título
+        centerTitle: true,
         title: Text(
           'Meu Perfil',
           style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600),
@@ -135,7 +177,8 @@ class _SettingsPageState extends State<SettingsPage> {
               context,
               Icons.delete_outline_rounded,
               'Deletar Conta',
-              '',
+              null,
+              onTap: _deleteAccount,
             ),
 
             Padding(
@@ -146,7 +189,13 @@ class _SettingsPageState extends State<SettingsPage> {
                   minimumSize: const Size.fromHeight(60),
                 ),
                 onPressed: () {
-                  Navigator.pushNamed(context, '/login');
+                  _auth.signOut().then((_) {
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      '/login',
+                      (route) => false,
+                    );
+                  });
                 },
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -175,15 +224,20 @@ class _SettingsPageState extends State<SettingsPage> {
     BuildContext context,
     IconData icon,
     String title,
-    String routeName,
-  ) {
+    String? routeName, {
+    VoidCallback? onTap,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
       child: InkWell(
         hoverColor: Colors.white,
-        onTap: () {
-          Navigator.pushNamed(context, routeName);
-        },
+        onTap:
+            onTap ??
+            () {
+              if (routeName != null && routeName.isNotEmpty) {
+                Navigator.pushNamed(context, routeName);
+              }
+            },
         child: Row(
           children: [
             CircleAvatar(
