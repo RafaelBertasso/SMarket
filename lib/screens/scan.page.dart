@@ -1,8 +1,14 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+import 'package:smarket/services/product.ai.service.dart';
+import 'package:smarket/services/firestore.service.dart';
+import 'package:smarket/widgets/product.dialog.dart';
+import 'package:smarket/widgets/product.form.dialog.dart';
 
 class ScanPage extends StatefulWidget {
   const ScanPage({super.key});
@@ -16,10 +22,16 @@ class _ScanPageState extends State<ScanPage> {
   CameraController? cameraController;
   XFile? photo;
   Size? size;
+  bool isLoading = false;
+
+  late final ProductAIService aiService;
+  final firestoreService = FirestoreService();
 
   @override
   void initState() {
     super.initState();
+    final apiKey = dotenv.env['GOOGLE_API_KEY'] ?? '';
+    aiService = ProductAIService(apiKey);
     _loadCameras();
   }
 
@@ -27,8 +39,8 @@ class _ScanPageState extends State<ScanPage> {
     try {
       cameras = await availableCameras();
       _startCamera();
-    } on CameraException catch (e) {
-      print(e.description);
+    } catch (e) {
+      print(e);
     }
   }
 
@@ -50,19 +62,59 @@ class _ScanPageState extends State<ScanPage> {
 
     try {
       await cameraController!.initialize();
-    } on CameraException catch (e) {
-      print(e.description);
+    } catch (e) {
+      print(e);
     }
 
-    if (mounted) {
-      setState(() {});
-    }
+    if (mounted) setState(() {});
   }
 
   void refazerFoto() {
     setState(() {
       photo = null;
     });
+  }
+
+  Future<void> processPhoto() async {
+    if (photo == null) return;
+
+    try {
+      setState(() => isLoading = true);
+
+      final bytes = await File(photo!.path).readAsBytes();
+      final jsonData = await aiService.predictProduct(bytes);
+
+      if (jsonData != null) {
+        final result = await showProductDialog(
+          context,
+          name: jsonData['name'] ?? '',
+          description: jsonData['description'] ?? '',
+          price: jsonData['price'] ?? '',
+        );
+
+        if (result != null) {
+          await firestoreService.addProduct(
+            name: result['name'] ?? '',
+            description: result['description'] ?? '',
+            price: result['price'] ?? '',
+          );
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Produto salvo com sucesso!')),
+          );
+
+          setState(() => photo = null);
+        }
+      } else {
+        throw Exception('Não consegui identificar o produto.');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
   }
 
   @override
@@ -104,7 +156,9 @@ class _ScanPageState extends State<ScanPage> {
         Padding(
           padding: const EdgeInsets.only(top: 16),
           child: ElevatedButton.icon(
-            onPressed: _showManualEntryDialog,
+            onPressed: () {
+              showDialog(context: context, builder: (context) => const ProductFormDialog());
+            },
             icon: const Icon(Icons.edit),
             label: Text(
               'Preencher Manualmente',
@@ -214,70 +268,6 @@ class _ScanPageState extends State<ScanPage> {
         print(e.description);
       }
     }
-  }
-
-  void _showManualEntryDialog() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        final _formKey = GlobalKey<FormState>();
-        String? name;
-        String? description;
-        String? price;
-        return AlertDialog(
-          title: Text('Preencher Produto', style: GoogleFonts.inter()),
-          content: Form(
-            key: _formKey,
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextFormField(
-                    decoration: InputDecoration(labelText: 'Nome do Produto'),
-                    onSaved: (value) => name = value,
-                    validator: (value) => value == null || value.isEmpty ? 'Campo obrigatório' : null,
-                  ),
-                  TextFormField(
-                    decoration: InputDecoration(labelText: 'Descrição'),
-                    onSaved: (value) => description = value,
-                  ),
-                  TextFormField(
-                    decoration: InputDecoration(labelText: 'Preço'),
-                    keyboardType: TextInputType.number,
-                    onSaved: (value) => price = value,
-                    validator: (value) => value == null || value.isEmpty ? 'Campo obrigatório' : null,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('Cancelar', style: GoogleFonts.inter()),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                if (_formKey.currentState!.validate()) {
-                  _formKey.currentState!.save();
-                  // Salva os dados no Firestore
-                  await FirebaseFirestore.instance.collection('produtos').add({
-                    'nome': name ?? '',
-                    'descricao': description ?? '',
-                    'preco': price ?? '',
-                  });
-                  Navigator.of(context).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Produto inserido manualmente!')),
-                  );
-                }
-              },
-              child: Text('Salvar', style: GoogleFonts.inter()),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   @override
