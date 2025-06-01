@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "723604083154",
+    "project_id": "smarket-2fc3c",
+    "storage_bucket": "smarket-2fc3c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:723604083154:android:d391b94d97703aff2b380b",
+        "android_client_info": {
+          "package_name": "com.example.smarket"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "723604083154-rqt15uriqribegfadql402rr842q3l63.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD7wvGpe-nRtk4KDfae08zuxtYlAEV77o4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "723604083154-rqt15uriqribegfadql402rr842q3l63.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:723604083154:android:75b61876243095582b380b",
+        "android_client_info": {
+          "package_name": "fatec.smarket"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "723604083154-rqt15uriqribegfadql402rr842q3l63.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD7wvGpe-nRtk4KDfae08zuxtYlAEV77o4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "723604083154-rqt15uriqribegfadql402rr842q3l63.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

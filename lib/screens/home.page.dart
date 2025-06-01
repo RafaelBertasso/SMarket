@@ -45,7 +45,6 @@ class HomePage extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
 
-                // Campo de busca
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   decoration: BoxDecoration(
@@ -70,7 +69,6 @@ class HomePage extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
 
-                // Título
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -85,11 +83,11 @@ class HomePage extends StatelessWidget {
                 ),
                 const SizedBox(height: 15),
 
-                // Categorias
                 SizedBox(
-                  height: 90,
+                  height: 110,
                   child: ListView(
                     scrollDirection: Axis.horizontal,
+                    padding: EdgeInsets.symmetric(horizontal: 0),
                     children: [
                       _buildCategoryButton(
                         context,
@@ -140,7 +138,6 @@ class HomePage extends StatelessWidget {
             ),
           ),
 
-          // Container branco fixo no rodapé
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
@@ -178,38 +175,41 @@ class HomePage extends StatelessWidget {
     String route,
   ) {
     return Padding(
-      padding: const EdgeInsets.only(right: 20),
-      child: SizedBox(
-        width: 70,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, route);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.black,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                elevation: 2,
-                minimumSize: const Size(70, 70),
-                padding: EdgeInsets.zero,
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Material(
+            borderRadius: BorderRadius.circular(16),
+            color: Colors.white,
+            elevation: 2,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(16),
+              onTap: () => Navigator.pushNamed(context, route),
+              child: Container(
+                width: 60,
+                height: 60,
+                alignment: Alignment.center,
+                child: Icon(icon, size: 28, color: Colors.black87),
               ),
-              child: Icon(icon, size: 28),
             ),
-            const SizedBox(height: 5),
-            Text(
+          ),
+          const SizedBox(height: 6),
+          SizedBox(
+            width: 70,
+            child: Text(
               label,
-              style: GoogleFonts.inter(fontSize: 12),
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                height: 1.2,
+              ),
               textAlign: TextAlign.center,
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              maxLines: 1,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

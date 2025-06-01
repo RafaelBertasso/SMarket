@@ -25,32 +25,32 @@ class LoginPage extends StatelessWidget {
 
       Navigator.pushReplacementNamed(context, '/main');
     } on FirebaseAuthException catch (e) {
-      final snackBar = SnackBar(
-        content: Text('Usuário ou senha inválidos'),
-      );
+      final snackBar = SnackBar(content: Text('Usuário ou senha inválidos'));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
   }
 
   Future<void> _loginWithGoogle(BuildContext context) async {
     try {
-      final GoogleSignInAccount? googleuser = await GoogleSignIn().signIn();
-      if (googleuser == null) {
-        return;
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      final GoogleSignInAuthentication? googleAuth =
+          await googleUser?.authentication;
+
+      if (googleAuth != null) {
+        final credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
+        );
+        UserCredential userCredential = await _auth.signInWithCredential(
+          credential,
+        );
       }
-
-      final GoogleSignInAuthentication googleAuth =
-          await googleuser.authentication;
-
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-      await _auth.signInWithCredential(credential);
-      Navigator.pushReplacementNamed(context, '/main');
-    } on FirebaseAuthException catch (e) {
+      if (_auth.currentUser != null) {
+        Navigator.pushReplacementNamed(context, '/main');
+      }
+    } on FirebaseAuthException catch (_) {
       final snackBar = SnackBar(
-        content: Text('Erro ao fazer login: ${e.message}'),
+        content: Text('Erro ao fazer login com o Google'),
       );
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
