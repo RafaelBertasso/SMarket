@@ -101,76 +101,79 @@ class _ScanPageState extends State<ScanPage> {
                   ? _cameraPreviewWidget()
                   : Image.file(File(photo!.path), fit: BoxFit.contain),
         ),
-        Padding(
-          padding: const EdgeInsets.only(top: 16),
-          child: ElevatedButton.icon(
-            onPressed: _showManualEntryDialog,
-            icon: const Icon(Icons.edit),
-            label: Text(
-              'Preencher Manualmente',
-              style: GoogleFonts.inter(fontSize: 14),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blueAccent,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 12,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-          ),
-        ),
-        if (photo != null)
-          Padding(
-            padding: const EdgeInsets.only(top: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton.icon(
-                  onPressed: refazerFoto,
-                  icon: const Icon(Icons.refresh),
-                  label: Text(
-                    'Refazer Foto',
-                    style: GoogleFonts.inter(fontSize: 14),
+        ...[
+          if (photo != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: refazerFoto,
+                    icon: const Icon(Icons.refresh),
+                    label: Text(
+                      'Refazer Foto',
+                      style: GoogleFonts.inter(fontSize: 14),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.redAccent,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
                   ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.redAccent,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 12,
+                  const SizedBox(width: 16),
+                  ElevatedButton.icon(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.check_circle),
+                    label: Text(
+                      'Finalizar',
+                      style: GoogleFonts.inter(fontSize: 14),
                     ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
+                  ),
+                ],
+              ),
+            )
+          else
+            Padding(
+              padding: const EdgeInsets.only(top: 16),
+              child: ElevatedButton.icon(
+                onPressed: _showManualEntryDialog,
+                icon: const Icon(Icons.edit),
+                label: Text(
+                  'Preencher Manualmente',
+                  style: GoogleFonts.inter(fontSize: 14),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                const SizedBox(width: 16),
-                ElevatedButton.icon(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.check_circle),
-                  label: Text(
-                    'Finalizar',
-                    style: GoogleFonts.inter(fontSize: 14),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 12,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
+        ],
       ],
     );
   }
@@ -235,7 +238,11 @@ class _ScanPageState extends State<ScanPage> {
                   TextFormField(
                     decoration: InputDecoration(labelText: 'Nome do Produto'),
                     onSaved: (value) => name = value,
-                    validator: (value) => value == null || value.isEmpty ? 'Campo obrigatório' : null,
+                    validator:
+                        (value) =>
+                            value == null || value.isEmpty
+                                ? 'Campo obrigatório'
+                                : null,
                   ),
                   TextFormField(
                     decoration: InputDecoration(labelText: 'Descrição'),
@@ -245,7 +252,11 @@ class _ScanPageState extends State<ScanPage> {
                     decoration: InputDecoration(labelText: 'Preço'),
                     keyboardType: TextInputType.number,
                     onSaved: (value) => price = value,
-                    validator: (value) => value == null || value.isEmpty ? 'Campo obrigatório' : null,
+                    validator:
+                        (value) =>
+                            value == null || value.isEmpty
+                                ? 'Campo obrigatório'
+                                : null,
                   ),
                 ],
               ),
