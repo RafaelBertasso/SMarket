@@ -49,6 +49,10 @@ dependencies:
   location:
   http:
   flutter_polyline_points: 
+  permission_handler:
+  image_picker:
+  google_generative_ai:
+  provider:
 
   
 dev_dependencies:

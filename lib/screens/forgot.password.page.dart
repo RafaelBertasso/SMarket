@@ -36,33 +36,33 @@ class ForgotPasswordPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        margin: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          spacing: 5,
-          children: [
-            Padding(
-              padding: EdgeInsets.only(top: 40, left:0),
+      body: SingleChildScrollView(
+        child: Container(
+          margin: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            spacing: 5,
+            children: [
+              Padding(
+                padding: EdgeInsets.only(top: 40, left: 0),
 
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Esqueceu a senha?',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Esqueceu a senha?',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+                  ),
                 ),
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.only(top: 8),
-              child: Text(
-                'Insira seu e-mail para receber o código de recuperação',
-                style: TextStyle(color: Colors.grey),
+              Padding(
+                padding: EdgeInsets.only(top: 8),
+                child: Text(
+                  'Insira seu e-mail para receber o código de recuperação',
+                  style: TextStyle(color: Colors.grey),
+                ),
               ),
-            ),
-            Padding(padding: EdgeInsets.all(40)),
-            Expanded(
-              child: Center(
+              Padding(padding: EdgeInsets.all(40)),
+              Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,15 +86,15 @@ class ForgotPasswordPage extends StatelessWidget {
                   ],
                 ),
               ),
-            ),
-            Spacer(),
-            CustomButton(
-              text: 'Enviar código',
-              onPressed: () {
-                _resetPassword(context);
-              },
-            ),
-          ],
+              SizedBox(height: 40),
+              CustomButton(
+                text: 'Enviar código',
+                onPressed: () {
+                  _resetPassword(context);
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

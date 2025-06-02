@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class SettingsPage extends StatefulWidget {
   SettingsPage({super.key});
@@ -17,6 +18,62 @@ class _SettingsPageState extends State<SettingsPage> {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final user = FirebaseAuth.instance.currentUser;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkCameraPermission();
+    _checkLocationPermission();
+  }
+
+  Future<void> _checkCameraPermission() async {
+    final status = await Permission.camera.status;
+    setState(() {
+      _cameraEnabled = status.isGranted;
+    });
+  }
+
+  Future<void> _toggleCamera(bool value) async {
+    if (value) {
+      final status = await Permission.camera.request();
+      if (status.isDenied) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Permissão de câmera negada')));
+      }
+    } else {
+      await Permission.camera.request();
+      await Permission.camera.shouldShowRequestRationale;
+    }
+    setState(() async {
+      _cameraEnabled = value && (await Permission.camera.status).isGranted;
+    });
+  }
+
+  Future<void> _checkLocationPermission() async {
+    final status = await Permission.location.status;
+    setState(() {
+      _locationEnabled = status.isGranted;
+    });
+  }
+
+  Future<void> _toggleLocation(bool value) async {
+    if (value) {
+      final status = await Permission.location.request();
+      if (status.isDenied) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Permissão de localização negada')),
+        );
+      }
+    } else {
+      await Permission.location.request();
+      await Permission.location.shouldShowRequestRationale;
+    }
+
+    setState(() async {
+      _locationEnabled = value && (await Permission.location.status).isGranted;
+    });
+  }
 
   void _deleteAccount() async {
     final confirm = await showDialog<bool>(
@@ -79,7 +136,6 @@ class _SettingsPageState extends State<SettingsPage> {
             const SizedBox(height: 10),
             Stack(
               children: [
-                // Foto do usuário
                 Container(
                   padding: const EdgeInsets.all(2),
                   child: const CircleAvatar(
@@ -115,8 +171,6 @@ class _SettingsPageState extends State<SettingsPage> {
               indent: 20,
               endIndent: 20,
             ),
-
-            // Configurações
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
               child: Align(
@@ -135,21 +189,13 @@ class _SettingsPageState extends State<SettingsPage> {
               Icons.camera_alt_outlined,
               'Permitir o Uso da Câmera',
               _cameraEnabled,
-              (value) {
-                setState(() {
-                  _cameraEnabled = value;
-                });
-              },
+              _toggleCamera,
             ),
             _buildToggleItem(
               Icons.place_outlined,
               'Permitir o Uso da Localização',
               _locationEnabled,
-              (value) {
-                setState(() {
-                  _locationEnabled = value;
-                });
-              },
+              _toggleLocation,
             ),
 
             Padding(
