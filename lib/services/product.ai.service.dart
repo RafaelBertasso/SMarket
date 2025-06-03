@@ -1,13 +1,18 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
 class ProductAIService {
-  final String apiKey;
-
-  ProductAIService(this.apiKey);
+  ProductAIService();
 
   Future<Map<String, dynamic>?> predictProduct(Uint8List image) async {
+    final apiKey = dotenv.env['GEMINI_API_KEY'];
+
+    if (apiKey == null || apiKey.isEmpty) {
+      throw Exception('Chave da API do Gemini não encontrada');
+    }
+
     final model = GenerativeModel(model: 'gemini-1.5-flash', apiKey: apiKey);
 
     final prompt = TextPart(
@@ -33,12 +38,9 @@ class ProductAIService {
       if (jsonStart == -1 || jsonEnd == -1) return null;
 
       final jsonString = text.substring(jsonStart, jsonEnd + 1);
-      final parsed = json.decode(jsonString);
+      final parsed = json.decode(jsonString) as Map<String, dynamic>;
 
-      if (parsed is Map<String, dynamic>) {
-        return parsed;
-      }
-      return null;
+      return parsed;
     } catch (e) {
       print(
         'Erro ao prever o produto com a IA, por favor, adicione os dados manualmente.',

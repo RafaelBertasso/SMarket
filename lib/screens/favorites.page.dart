@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:smarket/screens/product.info.page.dart';
 
 class FavoritesPage extends StatelessWidget {
   FavoritesPage({super.key});
