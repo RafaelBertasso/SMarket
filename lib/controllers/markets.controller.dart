@@ -78,28 +78,31 @@ out center;
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final elements = data['elements'] as List<dynamic>;
+        final List<Map<String, dynamic>> loadedMarkets = [];
 
-        final markets =
-            elements.map((e) {
-              final lat = e['lat'] ?? e['center']['lat'];
-              final lon = e['lon'] ?? e['center']['lon'];
-              return {
-                "name": e['tags']['name'] ?? 'Supermercado',
-                "location": LatLng(lat, lon),
-              };
-            }).toList();
+        for (var e in elements) {
+          final lat = e['lat'] ?? e['center']['lat'];
+          final lon = e['lon'] ?? e['center']['lon'];
+          final location = LatLng(lat, lon);
 
-        _updateState(_state.copyWith(markets: markets));
-      } else {
-        _updateState(
-          _state.copyWith(
-            errorMessage: 'Erro ao buscar mercados do OpenStreetMap.',
-          ),
-        );
+          final fullAddress = await getAddressFromCoordinates(location);
+          final road = fullAddress.split(',').first.trim();
+
+          loadedMarkets.add({
+            "name": e['tags']?['name']?.toString() ?? 'Supermercado',
+            "location": location,
+            "address": road.isNotEmpty ? road : 'Endereço não disponível',
+            "fullAddress": fullAddress,
+          });
+        }
+
+        _updateState(_state.copyWith(markets: loadedMarkets));
       }
     } catch (e) {
       _updateState(
-        _state.copyWith(errorMessage: 'Erro na conexão com o servidor OSM.'),
+        _state.copyWith(
+          errorMessage: 'Erro ao carregar mercados: ${e.toString()}',
+        ),
       );
     }
   }

@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:smarket/components/product.dialog.dart';
+import 'package:smarket/services/firestore.service.dart';
+import 'package:smarket/services/product.ai.service.dart';
 
 class ScanPage extends StatefulWidget {
   const ScanPage({super.key});
@@ -16,10 +19,15 @@ class _ScanPageState extends State<ScanPage> {
   CameraController? cameraController;
   XFile? photo;
   Size? size;
+  bool isLoading = false;
+
+  late final ProductAIService aiService;
+  final firestoreService = FirestoreService();
 
   @override
   void initState() {
     super.initState();
+    aiService = ProductAIService();
     _loadCameras();
   }
 
@@ -91,7 +99,7 @@ class _ScanPageState extends State<ScanPage> {
 
   Widget _arquivoWidget() {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center, //alterar altura da camera
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Container(
           width: size!.width - 50,
@@ -99,81 +107,81 @@ class _ScanPageState extends State<ScanPage> {
           child:
               photo == null
                   ? _cameraPreviewWidget()
-                  : Image.file(File(photo!.path), fit: BoxFit.contain),
+                  : Stack(
+                    children: [
+                      Image.file(File(photo!.path), fit: BoxFit.contain),
+                      if (isLoading) Center(child: CircularProgressIndicator()),
+                    ],
+                  ),
         ),
-        ...[
-          if (photo != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton.icon(
-                    onPressed: refazerFoto,
-                    icon: const Icon(Icons.refresh),
-                    label: Text(
-                      'Refazer Foto',
-                      style: GoogleFonts.inter(fontSize: 14),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.redAccent,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 12,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  ElevatedButton.icon(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.check_circle),
-                    label: Text(
-                      'Finalizar',
-                      style: GoogleFonts.inter(fontSize: 14),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 12,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                ],
+        if (photo == null)
+          Padding(
+            padding: const EdgeInsets.only(top: 16),
+            child: ElevatedButton.icon(
+              onPressed: _showManualEntryDialog,
+              icon: Icon(Icons.edit),
+              label: Text(
+                'Preencher Manualmente',
+                style: GoogleFonts.inter(fontSize: 14),
               ),
-            )
-          else
-            Padding(
-              padding: const EdgeInsets.only(top: 16),
-              child: ElevatedButton.icon(
-                onPressed: _showManualEntryDialog,
-                icon: const Icon(Icons.edit),
-                label: Text(
-                  'Preencher Manualmente',
-                  style: GoogleFonts.inter(fontSize: 14),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueAccent,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 12,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blueAccent,
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
             ),
-        ],
+          )
+        else
+          Padding(
+            padding: const EdgeInsets.only(top: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: refazerFoto,
+                  icon: const Icon(Icons.refresh),
+                  label: Text(
+                    'Refazer Foto',
+                    style: GoogleFonts.inter(fontSize: 14),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.redAccent,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                ElevatedButton.icon(
+                  onPressed: () => processPhoto,
+                  icon: const Icon(Icons.check_circle),
+                  label: Text(
+                    'Processar',
+                    style: GoogleFonts.inter(fontSize: 14),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
       ],
     );
   }
@@ -216,6 +224,52 @@ class _ScanPageState extends State<ScanPage> {
       } on CameraException catch (e) {
         print(e.description);
       }
+    }
+  }
+
+  Future<void> processPhoto() async {
+    if (photo == null) return;
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final bytes = await File(photo!.path).readAsBytes();
+      final productData = await aiService.predictProduct(bytes);
+
+      if (productData != null) {
+        final result = await showProductDialog(
+          context,
+          name: productData['name'] ?? 'Nome do produto não encontrado',
+          description: productData['description'] ?? 'Descrição não encontrada',
+          price: productData['price'] ?? 'Preço não encontrado',
+        );
+
+        if (result != null) {
+          await firestoreService.addProduct(
+            name: result['name'] ?? '',
+            description: result['description'] ?? '',
+            price: result['price'] ?? '',
+          );
+
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Produto salvo com sucesso!')));
+          refazerFoto();
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Não foi possível identificar o produto')),
+        );
+      }
+    } catch (_) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Erro')));
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -271,7 +325,6 @@ class _ScanPageState extends State<ScanPage> {
               onPressed: () async {
                 if (_formKey.currentState!.validate()) {
                   _formKey.currentState!.save();
-                  // Salva os dados no Firestore
                   await FirebaseFirestore.instance.collection('produtos').add({
                     'nome': name ?? '',
                     'descricao': description ?? '',

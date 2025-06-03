@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -14,7 +13,7 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   bool _cameraEnabled = false;
   bool _locationEnabled = false;
-  final _notificationsEnabled = false;
+
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final user = FirebaseAuth.instance.currentUser;

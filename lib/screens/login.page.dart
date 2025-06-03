@@ -24,7 +24,7 @@ class LoginPage extends StatelessWidget {
       );
 
       Navigator.pushReplacementNamed(context, '/main');
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException catch (_) {
       final snackBar = SnackBar(content: Text('Usuário ou senha inválidos'));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }

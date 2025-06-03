@@ -3,6 +3,9 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:smarket/components/loading_indication.dart';
+import 'package:smarket/components/market_details_dialog.dart';
+import 'package:smarket/components/market_marker.dart';
 import 'package:smarket/controllers/markets.controller.dart';
 
 class LocationPage extends StatefulWidget {
@@ -55,7 +58,7 @@ class _LocationPageState extends State<LocationPage> {
       body: Stack(
         children: [
           _controller.state.isLoading
-              ? Center(child: CircularProgressIndicator())
+              ? LoadingIndicator()
               : FlutterMap(
                 mapController: _controller.mapController,
                 options: MapOptions(
@@ -89,7 +92,7 @@ class _LocationPageState extends State<LocationPage> {
                               point: market['location'],
                               width: 40,
                               height: 40,
-                              child: GestureDetector(
+                              child: MarketMarkerContent(
                                 onTap: () async {
                                   final address = await _controller
                                       .getAddressFromCoordinates(
@@ -98,86 +101,17 @@ class _LocationPageState extends State<LocationPage> {
                                   showDialog(
                                     context: context,
                                     builder:
-                                        (context) => AlertDialog(
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              20,
-                                            ),
-                                          ),
-                                          backgroundColor: Colors.white,
-                                          title: Text(
-                                            market['name'],
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 18,
-                                              color: Colors.black87,
-                                            ),
-                                          ),
-                                          content: Text(
-                                            address,
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.grey[700],
-                                            ),
-                                          ),
-                                          actionsPadding: const EdgeInsets.only(
-                                            right: 16,
-                                            bottom: 12,
-                                          ),
-                                          actionsAlignment:
-                                              MainAxisAlignment.end,
-                                          actions: [
-                                            TextButton(
-                                              style: TextButton.styleFrom(
-                                                foregroundColor:
-                                                    Colors.redAccent,
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                      horizontal: 16,
-                                                      vertical: 10,
-                                                    ),
-                                              ),
-                                              onPressed:
-                                                  () => Navigator.pop(context),
-                                              child: const Text(
-                                                'Cancelar',
-                                                style: TextStyle(fontSize: 14),
-                                              ),
-                                            ),
-                                            ElevatedButton(
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor: Colors.blue,
-                                                foregroundColor: Colors.white,
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                      horizontal: 20,
-                                                      vertical: 10,
-                                                    ),
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(12),
-                                                ),
-                                              ),
-                                              onPressed: () async {
-                                                Navigator.pop(context);
-                                                _controller.fetchRouteToMarket(
-                                                  market['location'],
-                                                );
-                                              },
-                                              child: const Text(
-                                                'Rota',
-                                                style: TextStyle(fontSize: 14),
-                                              ),
-                                            ),
-                                          ],
+                                        (_) => MarketDetailsDialog(
+                                          marketName: market['name'],
+                                          address: address,
+                                          onRouteRequested:
+                                              () => _controller
+                                                  .fetchRouteToMarket(
+                                                    market['location'],
+                                                  ),
                                         ),
                                   );
                                 },
-                                child: Icon(
-                                  Icons.shopping_cart,
-                                  color: Colors.blue,
-                                  size: 30,
-                                ),
                               ),
                             );
                           }).toList(),

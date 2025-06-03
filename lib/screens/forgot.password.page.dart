@@ -27,7 +27,7 @@ class ForgotPasswordPage extends StatelessWidget {
         ),
       );
       Navigator.pushReplacementNamed(context, '/login');
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException catch (_) {
       final snackBar = SnackBar(content: Text('Erro ao enviar e-mail'));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
