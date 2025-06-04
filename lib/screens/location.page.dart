@@ -139,123 +139,61 @@ class _LocationPageState extends State<LocationPage> {
                       child: Autocomplete<String>(
                         optionsBuilder: (TextEditingValue textEditingValue) {
                           if (textEditingValue.text.isEmpty) {
-                            return Iterable<String>.empty();
+                            return const Iterable<String>.empty();
                           }
                           return _controller.state.markets
-                              .map((market) => market['name'].toString())
                               .where(
-                                (name) => name.toLowerCase().contains(
-                                  textEditingValue.text.toLowerCase(),
-                                ),
+                                (market) =>
+                                    '${market['name']} ${market['address']}'
+                                        .toLowerCase()
+                                        .contains(
+                                          textEditingValue.text.toLowerCase(),
+                                        ),
+                              )
+                              .map(
+                                (market) =>
+                                    '${market['name']} - ${market['address']}',
                               )
                               .toList();
                         },
-                        fieldViewBuilder: (
-                          context,
-                          controller,
-                          focusNode,
-                          onFieldSubmitted,
-                        ) {
-                          _controller.searchController.text = controller.text;
-                          return TextField(
-                            controller: controller,
-                            focusNode: focusNode,
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Colors.white,
-                              hintText: 'Digite o nome do mercado',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30),
-                                borderSide: BorderSide.none,
-                              ),
-                              contentPadding: EdgeInsets.symmetric(
-                                horizontal: 20,
-                              ),
-                            ),
-                            onSubmitted: (value) {
-                              if (value.isNotEmpty) {
-                                _controller.fetchCoordinatesPoint(value);
-                              }
-                            },
-                          );
-                        },
-                        onSelected: (String selectedName) async {
+                        onSelected: (String selectedOption) async {
                           final selectedMarket = _controller.state.markets
                               .firstWhere(
-                                (market) => market['name'] == selectedName,
+                                (market) =>
+                                    '${market['name']} - ${market['address']}' ==
+                                    selectedOption,
+                                orElse:
+                                    () => {
+                                      'name': 'Mercado não encontrado',
+                                      'location': LatLng(0, 0),
+                                      'address': 'Endereço não disponível',
+                                      'fullAddress':
+                                          'Não foi possível obter o endereço completo',
+                                    },
                               );
-
-                          final location = selectedMarket['location'] as LatLng;
-                          final address = await _controller
-                              .getAddressFromCoordinates(location);
-
                           showDialog(
                             context: context,
                             builder:
                                 (context) => AlertDialog(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  backgroundColor: Colors.white,
-                                  title: Text(
-                                    selectedName,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18,
-                                      color: Colors.black87,
-                                    ),
-                                  ),
+                                  icon: Icon(Icons.search),
+                                  title: Text('${selectedMarket['name']}'),
                                   content: Text(
-                                    address,
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey[700],
-                                    ),
+                                    '${selectedMarket['fullAddress']}',
+                                    style: TextStyle(fontSize: 14),
                                   ),
-                                  actionsPadding: EdgeInsets.only(
-                                    right: 16,
-                                    bottom: 12,
-                                  ),
-                                  actionsAlignment: MainAxisAlignment.end,
                                   actions: [
                                     TextButton(
-                                      style: TextButton.styleFrom(
-                                        foregroundColor: Colors.redAccent,
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: 16,
-                                          vertical: 10,
-                                        ),
-                                      ),
                                       onPressed: () => Navigator.pop(context),
-                                      child: Text(
-                                        'Cancelar',
-                                        style: TextStyle(fontSize: 14),
-                                      ),
+                                      child: const Text('Fechar'),
                                     ),
                                     ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.blue,
-                                        foregroundColor: Colors.white,
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: 20,
-                                          vertical: 10,
-                                        ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                        ),
-                                      ),
-                                      onPressed: () async {
+                                      onPressed: () {
                                         Navigator.pop(context);
                                         _controller.fetchRouteToMarket(
-                                          location,
+                                          selectedMarket['location'],
                                         );
                                       },
-                                      child: Text(
-                                        'Rota',
-                                        style: TextStyle(fontSize: 14),
-                                      ),
+                                      child: const Text('Traçar Rota'),
                                     ),
                                   ],
                                 ),
