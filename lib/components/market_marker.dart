@@ -1,4 +1,3 @@
-// market_marker_content.dart
 import 'package:flutter/material.dart';
 
 class MarketMarkerContent extends StatelessWidget {

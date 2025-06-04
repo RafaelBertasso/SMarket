@@ -120,7 +120,10 @@ out center;
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final address = data['address'];
-        return _formatAddress(address);
+        final formatted = _formatAddress(address);
+        return (formatted != null && formatted.trim().isNotEmpty)
+            ? formatted
+            : 'Endereço não disponível';
       }
       return 'Erro ao obter endereço';
     } catch (e) {

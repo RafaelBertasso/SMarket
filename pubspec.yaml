@@ -55,6 +55,7 @@ dependencies:
   google_generative_ai:
   provider:
   flutter_dotenv:
+  intl:
 
   
 dev_dependencies:

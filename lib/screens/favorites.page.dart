@@ -43,7 +43,6 @@ class FavoritesPage extends StatelessWidget {
         ),
       ),
 
-      // 🔥 LISTA COM STREAM DO FIRESTORE
       body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: _db.collection('produtos').snapshots(),
         builder: (context, snapshot) {
@@ -77,7 +76,6 @@ class FavoritesPage extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
-                        // Imagem do Produto
                         Container(
                           width: 60,
                           height: 60,
@@ -94,8 +92,6 @@ class FavoritesPage extends StatelessWidget {
                         ),
 
                         SizedBox(width: 12),
-
-                        // Nome e descrição
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -122,7 +118,6 @@ class FavoritesPage extends StatelessWidget {
                           ),
                         ),
 
-                        // Preço
                         Container(
                           width: 100,
                           alignment: Alignment.center,
