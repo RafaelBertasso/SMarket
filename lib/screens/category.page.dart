@@ -62,7 +62,6 @@ class _CategoryPageState extends State<CategoryPage> {
                 }
 
                 if (snapshot.hasError) {
-                
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -125,9 +124,10 @@ class _CategoryPageState extends State<CategoryPage> {
   }
 
   Stream<QuerySnapshot> _buildProductStream() {
+    final formattedCategory = widget.categoryName.toLowerCase();
     Query query = FirebaseFirestore.instance
         .collection('produtos')
-        .where('categoria', isEqualTo: widget.categoryName.toLowerCase())
+        .where('categoria', isEqualTo: formattedCategory)
         .orderBy('dataAdicionado', descending: true);
 
     if (_selectedMarket != 'Todos') {
@@ -162,10 +162,7 @@ class _CategoryPageState extends State<CategoryPage> {
         title: Text(product['nome']),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('R\$ ${product['preco']}'),
-            Text(product['mercado']),
-          ],
+          children: [Text('R\$ ${product['preco']}'), Text(product['mercado'])],
         ),
         trailing: IconButton(
           icon: Icon(
@@ -319,19 +316,5 @@ class _CategoryPageState extends State<CategoryPage> {
         );
       }
     }
-  }
-
-  Future<List<String>> _fetchMarkets() async {
-    final snapshot =
-        await FirebaseFirestore.instance
-            .collection('produtos')
-            .where('categoria', isEqualTo: widget.categoryName.toLowerCase())
-            .get();
-
-    final markets =
-        snapshot.docs.map((doc) => doc['mercado'] as String).toSet().toList();
-
-    markets.sort();
-    return markets;
   }
 }

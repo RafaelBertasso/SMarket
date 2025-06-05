@@ -403,7 +403,7 @@ class _ScanPageState extends State<ScanPage> with WidgetsBindingObserver {
           category:
               productData['category']?.toLowerCase() ??
               'Categoria não encontrada',
-          market: productData['market'] ?? 'Mercado não encontrado',
+          market: productData['market'] ?? '',
         );
 
         if (result != null) {
@@ -420,7 +420,7 @@ class _ScanPageState extends State<ScanPage> with WidgetsBindingObserver {
                 result['category']?.toLowerCase() ??
                 'outros',
             'mercado': result['market'] ?? '',
-            'timestamp': FieldValue.serverTimestamp(),
+            'dataAdicionado': FieldValue.serverTimestamp(),
             'favoritadoPor': [],
           });
 

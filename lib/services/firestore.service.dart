@@ -18,7 +18,7 @@ class FirestoreService {
         'preco': price.trim(),
         'categoria': category.toLowerCase().trim(),
         'mercado': market.trim(),
-        'timestamp': FieldValue.serverTimestamp(),
+        'dataAdicionado': FieldValue.serverTimestamp(),
         'favoritadoPor': [],
       });
     } catch (_) {
