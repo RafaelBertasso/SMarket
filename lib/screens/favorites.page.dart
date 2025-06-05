@@ -123,7 +123,7 @@ class FavoritesPage extends StatelessWidget {
                           alignment: Alignment.center,
                           child: Text(
                             data['preco'] != null
-                                ? 'R\$ ${double.parse(data['preco']).toStringAsFixed(2)}'
+                                ? 'R\$ ${(data['preco'])}'
                                 : 'R\$ 0,00',
                             style: GoogleFonts.inter(
                               fontSize: 14,

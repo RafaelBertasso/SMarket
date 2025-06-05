@@ -14,11 +14,8 @@ class CategoryPage extends StatefulWidget {
 
 class _CategoryPageState extends State<CategoryPage> {
   final userId = FirebaseAuth.instance.currentUser?.uid;
-  final TextEditingController _marketSearchController = TextEditingController();
-  final FocusNode _marketSearchFocusNode = FocusNode();
   String _searchQuery = '';
   String _selectedMarket = 'Todos';
-  final bool _indexCreated = false;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -65,7 +62,6 @@ class _CategoryPageState extends State<CategoryPage> {
                 }
 
                 if (snapshot.hasError) {
-                
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -128,9 +124,10 @@ class _CategoryPageState extends State<CategoryPage> {
   }
 
   Stream<QuerySnapshot> _buildProductStream() {
+    final formattedCategory = widget.categoryName.toLowerCase();
     Query query = FirebaseFirestore.instance
         .collection('produtos')
-        .where('categoria', isEqualTo: widget.categoryName.toLowerCase())
+        .where('categoria', isEqualTo: formattedCategory)
         .orderBy('dataAdicionado', descending: true);
 
     if (_selectedMarket != 'Todos') {
@@ -165,10 +162,7 @@ class _CategoryPageState extends State<CategoryPage> {
         title: Text(product['nome']),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('R\$ ${product['preco']}'),
-            Text(product['mercado']),
-          ],
+          children: [Text('R\$ ${product['preco']}'), Text(product['mercado'])],
         ),
         trailing: IconButton(
           icon: Icon(
@@ -207,7 +201,6 @@ class _CategoryPageState extends State<CategoryPage> {
 
   Future<void> _showFilterDialog() async {
     try {
-      // Mostra um loading enquanto carrega os mercados
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -217,11 +210,9 @@ class _CategoryPageState extends State<CategoryPage> {
       final marketsController = MarketsController();
       await marketsController.findMarketsOSM();
 
-      // Fecha o loading
       if (!mounted) return;
       Navigator.pop(context);
 
-      // Mostra o diálogo com os dados
       if (!mounted) return;
       await showDialog(
         context: context,
@@ -325,19 +316,5 @@ class _CategoryPageState extends State<CategoryPage> {
         );
       }
     }
-  }
-
-  Future<List<String>> _fetchMarkets() async {
-    final snapshot =
-        await FirebaseFirestore.instance
-            .collection('produtos')
-            .where('categoria', isEqualTo: widget.categoryName.toLowerCase())
-            .get();
-
-    final markets =
-        snapshot.docs.map((doc) => doc['mercado'] as String).toSet().toList();
-
-    markets.sort();
-    return markets;
   }
 }

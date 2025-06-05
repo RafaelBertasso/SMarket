@@ -191,14 +191,14 @@ class HomePage extends StatelessWidget {
                               FirebaseFirestore.instance
                                   .collection('produtos')
                                   .where(
-                                    'timestamp',
+                                    'dataAdicionado',
                                     isGreaterThanOrEqualTo: Timestamp.fromDate(
                                       DateTime.now().subtract(
                                         const Duration(days: 1),
                                       ),
                                     ),
                                   )
-                                  .orderBy('timestamp', descending: true)
+                                  .orderBy('dataAdicionado', descending: true)
                                   .snapshots(),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
@@ -322,8 +322,8 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _buildProdutoCard(DocumentSnapshot produto) {
-    final timestamp = produto['timestamp'] as Timestamp;
-    final addDate = timestamp.toDate();
+    final dataAdicionado = produto['dataAdicionado'] as Timestamp;
+    final addDate = dataAdicionado.toDate();
     final now = DateTime.now();
     final diff = now.difference(addDate);
 
