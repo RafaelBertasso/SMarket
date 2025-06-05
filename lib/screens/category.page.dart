@@ -14,11 +14,8 @@ class CategoryPage extends StatefulWidget {
 
 class _CategoryPageState extends State<CategoryPage> {
   final userId = FirebaseAuth.instance.currentUser?.uid;
-  final TextEditingController _marketSearchController = TextEditingController();
-  final FocusNode _marketSearchFocusNode = FocusNode();
   String _searchQuery = '';
   String _selectedMarket = 'Todos';
-  final bool _indexCreated = false;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -207,7 +204,6 @@ class _CategoryPageState extends State<CategoryPage> {
 
   Future<void> _showFilterDialog() async {
     try {
-      // Mostra um loading enquanto carrega os mercados
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -217,11 +213,9 @@ class _CategoryPageState extends State<CategoryPage> {
       final marketsController = MarketsController();
       await marketsController.findMarketsOSM();
 
-      // Fecha o loading
       if (!mounted) return;
       Navigator.pop(context);
 
-      // Mostra o diálogo com os dados
       if (!mounted) return;
       await showDialog(
         context: context,

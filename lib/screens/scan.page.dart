@@ -4,8 +4,9 @@ import 'package:camera/camera.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:permission_handler/permission_handler.dart';
+
 import 'package:smarket/components/product.dialog.dart';
-import 'package:smarket/controllers/markets.controller.dart';
 import 'package:smarket/models/currency.input.formatter.dart';
 import 'package:smarket/services/firestore.service.dart';
 import 'package:smarket/services/product.ai.service.dart';
@@ -17,12 +18,14 @@ class ScanPage extends StatefulWidget {
   State<ScanPage> createState() => _ScanPageState();
 }
 
-class _ScanPageState extends State<ScanPage> {
+class _ScanPageState extends State<ScanPage> with WidgetsBindingObserver {
   List<CameraDescription> cameras = [];
   CameraController? cameraController;
   XFile? photo;
   Size? size;
   bool isLoading = false;
+  bool _isCameraPermissionGranted = false;
+  bool _showCameraPermissionError = false;
 
   late final ProductAIService aiService;
   final firestoreService = FirestoreService();
@@ -30,28 +33,99 @@ class _ScanPageState extends State<ScanPage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     aiService = ProductAIService();
-    _loadCameras();
   }
 
-  _loadCameras() async {
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _checkCameraPermission();
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    cameraController?.dispose();
+    super.dispose();
+  }
+
+  Future<void> _checkCameraPermission() async {
+    final status = await Permission.camera.status;
+
+    setState(() {
+      _isCameraPermissionGranted = status.isGranted;
+      _showCameraPermissionError = status.isPermanentlyDenied;
+    });
+
+    if (_isCameraPermissionGranted && cameraController == null) {
+      await _initializeCamera();
+    }
+  }
+
+  Future<void> _initializeCamera() async {
     try {
       cameras = await availableCameras();
-      _startCamera();
-    } on CameraException catch (e) {
-      print(e.description);
+      if (cameras.isNotEmpty) {
+        await _previewCamera(cameras.first);
+      } else {
+        setState(() {
+          _showCameraPermissionError = true;
+        });
+      }
+    } catch (e) {
+      print('Erro ao carregar câmeras: $e');
+      setState(() {
+        _showCameraPermissionError = true;
+      });
     }
   }
 
-  _startCamera() {
-    if (cameras.isEmpty) {
-      print("Câmera não encontrada");
-    } else {
-      _previewCamera(cameras.first);
+  Future<void> _requestCameraPermission() async {
+    final status = await Permission.camera.request();
+
+    setState(() {
+      _isCameraPermissionGranted = status.isGranted;
+      _showCameraPermissionError = status.isPermanentlyDenied;
+    });
+
+    if (_isCameraPermissionGranted) {
+      await _initializeCamera();
+    } else if (status.isPermanentlyDenied) {
+      await _showPermissionDeniedDialog('câmera');
     }
   }
 
-  _previewCamera(CameraDescription camera) async {
+  Future<void> _showPermissionDeniedDialog(String permission) async {
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder:
+          (context) => AlertDialog(
+            title: Text('Permissão de $permission necessária'),
+            content: Text(
+              'Para usar esta funcionalidade, você precisa conceder permissão '
+              'de $permission nas configurações do aplicativo.',
+            ),
+            actions: [
+              TextButton(
+                child: const Text('Cancelar'),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+              TextButton(
+                child: const Text('Abrir Configurações'),
+                onPressed: () {
+                  openAppSettings();
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+    );
+  }
+
+  Future<void> _previewCamera(CameraDescription camera) async {
     cameraController = CameraController(
       camera,
       ResolutionPreset.high,
@@ -61,12 +135,12 @@ class _ScanPageState extends State<ScanPage> {
 
     try {
       await cameraController!.initialize();
-    } on CameraException catch (e) {
-      print(e.description);
-    }
-
-    if (mounted) {
-      setState(() {});
+      if (mounted) setState(() {});
+    } catch (e) {
+      print('Erro ao iniciar a câmera: $e');
+      setState(() {
+        _showCameraPermissionError = true;
+      });
     }
   }
 
@@ -81,7 +155,7 @@ class _ScanPageState extends State<ScanPage> {
     size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
-        leading: Text(""),
+        leading: const Text(""),
         backgroundColor: Colors.grey[900],
         centerTitle: true,
         title: Text(
@@ -96,13 +170,63 @@ class _ScanPageState extends State<ScanPage> {
       body: SingleChildScrollView(
         child: Container(
           color: Colors.grey[900],
-          child: Center(child: _arquivoWidget()),
+          child: Center(child: _buildMainContent()),
         ),
       ),
     );
   }
 
-  Widget _arquivoWidget() {
+  Widget _buildMainContent() {
+    if (!_showCameraPermissionError && !_isCameraPermissionGranted) {
+      return _buildInitialCameraUI();
+    }
+
+    if (_showCameraPermissionError) {
+      return _buildPermissionErrorWidget('câmera', _requestCameraPermission);
+    }
+
+    if (!_isCameraPermissionGranted || cameraController == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    return _buildCameraUI();
+  }
+
+  Widget _buildInitialCameraUI() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(Icons.camera_alt, size: 80, color: Colors.white),
+        SizedBox(height: 20),
+        Text(
+          'Pronto para escanear promoções',
+          style: GoogleFonts.inter(
+            fontSize: 18,
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        SizedBox(height: 20),
+        ElevatedButton(
+          onPressed: _requestCameraPermission,
+          style: ElevatedButton.styleFrom(
+            padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+          ),
+          child: Text('Iniciar Câmera', style: GoogleFonts.inter(fontSize: 16)),
+        ),
+        SizedBox(height: 10),
+        TextButton(
+          onPressed: _showManualEntryDialog,
+          child: Text(
+            'Ou preencha manualmente',
+            style: GoogleFonts.inter(fontSize: 14, color: Colors.blueAccent),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCameraUI() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -114,7 +238,7 @@ class _ScanPageState extends State<ScanPage> {
                   ? _cameraPreviewWidget()
                   : Stack(
                     children: [
-                      Image.file(File(photo!.path), fit: BoxFit.contain),
+                      Image.file(File(photo!.path)),
                       if (isLoading) Center(child: CircularProgressIndicator()),
                     ],
                   ),
@@ -129,14 +253,7 @@ class _ScanPageState extends State<ScanPage> {
                 'Preencher Manualmente',
                 style: GoogleFonts.inter(fontSize: 14),
               ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
-                foregroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
+              style: _buttonStyle(Colors.blueAccent),
             ),
           )
         else
@@ -152,42 +269,77 @@ class _ScanPageState extends State<ScanPage> {
                     'Refazer Foto',
                     style: GoogleFonts.inter(fontSize: 14),
                   ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.redAccent,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 12,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
+                  style: _buttonStyle(Colors.redAccent),
                 ),
                 const SizedBox(width: 16),
                 ElevatedButton.icon(
-                  onPressed: () => processPhoto,
+                  onPressed: processPhoto,
                   icon: const Icon(Icons.check_circle),
                   label: Text(
                     'Processar',
                     style: GoogleFonts.inter(fontSize: 14),
                   ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 12,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
+                  style: _buttonStyle(Colors.green),
                 ),
               ],
             ),
           ),
       ],
+    );
+  }
+
+  ButtonStyle _buttonStyle(Color color) {
+    return ElevatedButton.styleFrom(
+      backgroundColor: color,
+      foregroundColor: Colors.white,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    );
+  }
+
+  Widget _buildPermissionErrorWidget(String permission, Function onRetry) {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.error, size: 50, color: Colors.white),
+          SizedBox(height: 20),
+          Text(
+            'Permissão de $permission necessária',
+            style: GoogleFonts.inter(
+              fontSize: 18,
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(height: 10),
+          Text(
+            'Para usar esta funcionalidade, precisamos acessar sua $permission.',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.inter(fontSize: 14, color: Colors.white70),
+          ),
+          SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () => openAppSettings(),
+            child: Text(
+              'Abrir Configurações',
+              style: GoogleFonts.inter(fontSize: 16),
+            ),
+          ),
+          SizedBox(height: 10),
+          TextButton(
+            onPressed: () async {
+              await onRetry();
+              if (mounted) setState(() {});
+            },
+            child: Text(
+              'Tentar novamente',
+              style: GoogleFonts.inter(fontSize: 14, color: Colors.blueAccent),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -248,29 +400,53 @@ class _ScanPageState extends State<ScanPage> {
           name: productData['name'] ?? 'Nome do produto não encontrado',
           description: productData['description'] ?? 'Descrição não encontrada',
           price: productData['price'] ?? 'Preço não encontrado',
+          category:
+              productData['category']?.toLowerCase() ??
+              'Categoria não encontrada',
+          market: productData['market'] ?? 'Mercado não encontrado',
         );
 
         if (result != null) {
-          await firestoreService.addProduct(
-            name: result['name'] ?? '',
-            description: result['description'] ?? '',
-            price: result['price'] ?? '',
+          final price = double.tryParse(
+            result['price']?.replaceAll(RegExp(r'[^\d]'), '') ?? '0',
           );
+          final finalPrice = ((price ?? 0) / 100).toStringAsFixed(2);
 
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Produto salvo com sucesso!')));
+          await FirebaseFirestore.instance.collection('produtos').add({
+            'nome': result['name'] ?? '',
+            'descricao': result['description'] ?? '',
+            'preco': finalPrice,
+            'categoria':
+                result['category']?.toLowerCase() ??
+                'outros',
+            'mercado': result['market'] ?? '',
+            'timestamp': FieldValue.serverTimestamp(),
+            'favoritadoPor': [],
+          });
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Produto salvo com sucesso!'),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          );
           refazerFoto();
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Não foi possível identificar o produto')),
+          const SnackBar(
+            content: Text('Não foi possível identificar o produto'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     } catch (_) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Erro')));
+      ).showSnackBar(const SnackBar(content: Text('Erro')));
     } finally {
       setState(() {
         isLoading = false;
@@ -282,7 +458,6 @@ class _ScanPageState extends State<ScanPage> {
     final formKey = GlobalKey<FormState>();
     final priceController = TextEditingController();
     final marketController = TextEditingController();
-    final categoryController = TextEditingController();
 
     final List<String> categories = [
       'Açougue',
@@ -349,7 +524,6 @@ class _ScanPageState extends State<ScanPage> {
                     ),
                     const SizedBox(height: 20),
 
-                    // Campo Nome
                     TextFormField(
                       decoration: InputDecoration(
                         labelText: 'Nome do Produto',
@@ -381,7 +555,6 @@ class _ScanPageState extends State<ScanPage> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Campo Categoria (Autocomplete)
                     DropdownButtonFormField<String>(
                       decoration: InputDecoration(
                         labelText: 'Categoria',
@@ -405,7 +578,6 @@ class _ScanPageState extends State<ScanPage> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Campo Mercado (Autocomplete)
                     TextFormField(
                       controller: marketController,
                       decoration: InputDecoration(
@@ -424,7 +596,6 @@ class _ScanPageState extends State<ScanPage> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Campo Preço
                     TextFormField(
                       controller: priceController,
                       decoration: InputDecoration(
@@ -550,11 +721,5 @@ class _ScanPageState extends State<ScanPage> {
         );
       },
     );
-  }
-
-  @override
-  void dispose() {
-    cameraController?.dispose();
-    super.dispose();
   }
 }

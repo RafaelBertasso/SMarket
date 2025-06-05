@@ -121,7 +121,7 @@ out center;
         final data = json.decode(response.body);
         final address = data['address'];
         final formatted = _formatAddress(address);
-        return (formatted != null && formatted.trim().isNotEmpty)
+        return (formatted.trim().isNotEmpty)
             ? formatted
             : 'Endereço não disponível';
       }

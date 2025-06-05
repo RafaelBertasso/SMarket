@@ -8,15 +8,21 @@ class FirestoreService {
     required String name,
     required String description,
     required String price,
+    required String category,
+    required String market,
   }) async {
     try {
       await productsCollection.add({
         'nome': name.trim(),
         'descricao': description.trim(),
         'preco': price.trim(),
+        'categoria': category.toLowerCase().trim(),
+        'mercado': market.trim(),
+        'timestamp': FieldValue.serverTimestamp(),
+        'favoritadoPor': [],
       });
     } catch (_) {
-      print('Erro ao adicionar produto');
+      throw Exception('Erro ao adicionar produto ao Firestore');
     }
   }
 }
