@@ -5,16 +5,9 @@ import 'package:provider/provider.dart';
 import '../providers/favorites.provider.dart';
 import 'product.info.page.dart';
 
-class FavoritesPage extends StatefulWidget {
+class FavoritesPage extends StatelessWidget {
   FavoritesPage({super.key});
   final _db = FirebaseFirestore.instance;
-
-  @override
-  State<FavoritesPage> createState() => _FavoritesPageState();
-}
-
-class _FavoritesPageState extends State<FavoritesPage> {
-  final Set<String> _removingItems = <String>{};
 
   String _getCategoryImage(String? category) {
     if (category == null) return 'assets/images/default.png';
@@ -54,7 +47,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
           }
 
           return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-            stream: widget._db
+            stream: _db
                 .collection('produtos')
                 .where(FieldPath.documentId, whereIn: favoriteIds.toList())
                 .snapshots(),
@@ -76,12 +69,6 @@ class _FavoritesPageState extends State<FavoritesPage> {
                 itemCount: snapshot.data!.docs.length,
                 itemBuilder: (context, index) {
                   final doc = snapshot.data!.docs[index];
-                  
-                  // Skip items that are being removed
-                  if (_removingItems.contains(doc.id)) {
-                    return const SizedBox.shrink();
-                  }
-                  
                   return _buildProductCard(context, doc, favoritesProvider);
                 },
               );
@@ -183,44 +170,24 @@ class _FavoritesPageState extends State<FavoritesPage> {
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
       margin: const EdgeInsets.only(bottom: 12),
-      child: Dismissible(
-        key: Key(doc.id),
-        direction: DismissDirection.endToStart,
-        background: Container(
-          alignment: Alignment.centerRight,
-          padding: const EdgeInsets.only(right: 20),
-          decoration: BoxDecoration(
-            color: Colors.red,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: const Icon(
-            Icons.delete,
-            color: Colors.white,
-            size: 24,
-          ),
+      child: Card(
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: Colors.grey.shade200),
         ),
-        onDismissed: (direction) {
-          _toggleFavorite(favoritesProvider, doc.id);
-        },
-        child: Card(
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-            side: BorderSide(color: Colors.grey.shade200),
-          ),
-          child: InkWell(
-            onTap: () => _navigateToProduct(context, doc.id),
-            borderRadius: BorderRadius.circular(16),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  _buildProductImage(data),
-                  const SizedBox(width: 16),
-                  Expanded(child: _buildProductInfo(data)),
-                  _buildPriceAndFavorite(data, doc.id, favoritesProvider),
-                ],
-              ),
+        child: InkWell(
+          onTap: () => _navigateToProduct(context, doc.id),
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                _buildProductImage(data),
+                const SizedBox(width: 16),
+                Expanded(child: _buildProductInfo(data)),
+                _buildPriceAndFavorite(data, doc.id, favoritesProvider),
+              ],
             ),
           ),
         ),
@@ -301,46 +268,55 @@ class _FavoritesPageState extends State<FavoritesPage> {
     );
   }
 
-                        Container(
-                          width: 100,
-                          alignment: Alignment.center,
-                          child: Text(
-                            data['preco'] != null
-                                ? 'R\$ ${double.parse(data['preco']).toStringAsFixed(2)}'
-                                : 'R\$ 0,00',
-                            style: GoogleFonts.inter(
-                              fontSize: 14,
-                              color: Colors.green[700],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList(),
-          );
-        },
+  Widget _buildPriceAndFavorite(
+    Map<String, dynamic> data,
+    String productId,
+    FavoritesProvider favoritesProvider,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Text(
+          data['preco'] != null
+              ? 'R\$ ${double.parse(data['preco'].toString()).toStringAsFixed(2).replaceAll('.', ',')}'
+              : 'R\$ 0,00',
+          style: GoogleFonts.inter(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.deepOrange,
+          ),
+        ),
+        const SizedBox(height: 8),
+        AnimatedScale(
+          scale: 1.0,
+          duration: const Duration(milliseconds: 150),
+          child: IconButton(
+            onPressed: () => _toggleFavorite(favoritesProvider, productId),
+            icon: const Icon(
+              Icons.favorite,
+              color: Colors.red,
+              size: 24,
+            ),
+            style: IconButton.styleFrom(
+              backgroundColor: Colors.red.shade50,
+              padding: const EdgeInsets.all(8),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _navigateToProduct(BuildContext context, String productId) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ProductInfoPage(productId: productId),
       ),
     );
   }
 
   void _toggleFavorite(FavoritesProvider favoritesProvider, String productId) {
-    setState(() {
-      _removingItems.add(productId);
-    });
-    
-    // Add a small delay to show the animation before actually removing
-    Future.delayed(const Duration(milliseconds: 50), () {
-      favoritesProvider.toggleFavorite(productId);
-      
-      // Clean up the removing items set after a delay
-      Future.delayed(const Duration(milliseconds: 500), () {
-        if (mounted) {
-          setState(() {
-            _removingItems.remove(productId);
-          });
-        }
-      });
-    });
+    favoritesProvider.toggleFavorite(productId);
   }
 }
