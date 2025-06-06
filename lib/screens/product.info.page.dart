@@ -1,66 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
+import 'package:smarket/components/product.info.components.dart';
+import 'package:smarket/controllers/product.info.controller.dart';
+import 'package:smarket/models/product.info.model.dart';
 import '../providers/favorites.provider.dart';
 
 class ProductInfoPage extends StatelessWidget {
-  const ProductInfoPage({super.key, required this.productId});
+  ProductInfoPage({super.key, required this.productId});
 
   final String productId;
-
-  Future<DocumentSnapshot<Map<String, dynamic>>> _fetchProduct() {
-    return FirebaseFirestore.instance.collection('produtos').doc(productId).get();
-  }
-
-  String _getCategoryImage(String? category) {
-    if (category == null) return 'assets/images/default.png';
-    
-    switch (category.toLowerCase()) {
-      case 'açougue':
-      case 'acougue':
-        return 'assets/images/acougue.png';
-      case 'bebidas':
-        return 'assets/images/bebidas.png';
-      case 'feirinha':
-        return 'assets/images/feirinha.png';
-      case 'higiene':
-        return 'assets/images/higiene.png';
-      case 'limpeza':
-        return 'assets/images/limpeza.png';
-      case 'massas':
-        return 'assets/images/massas.png';
-      case 'pet':
-        return 'assets/images/pet.png';
-      default:
-        return 'assets/images/default.png';
-    }
-  }
-
-  String _formatDate(dynamic dateField) {
-    if (dateField == null) return 'Data não informada';
-    
-    DateTime date;
-    if (dateField is Timestamp) {
-      date = dateField.toDate();
-    } else if (dateField is String) {
-      try {
-        date = DateTime.parse(dateField);
-      } catch (e) {
-        return dateField;
-      }
-    } else {
-      return dateField.toString();
-    }
-    
-    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
-  }
+  final ProductController _productController = ProductController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
-      body: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-        future: _fetchProduct(),
+      body: FutureBuilder<ProductModel>(
+        future: _productController.fetchProduct(productId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
@@ -69,8 +25,8 @@ class ProductInfoPage extends StatelessWidget {
               ),
             );
           }
-          
-          if (!snapshot.hasData || !snapshot.data!.exists) {
+
+          if (snapshot.hasError || !snapshot.hasData) {
             return Scaffold(
               appBar: AppBar(
                 backgroundColor: Colors.transparent,
@@ -81,11 +37,7 @@ class ProductInfoPage extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.search_off,
-                      size: 64,
-                      color: Colors.grey,
-                    ),
+                    Icon(Icons.search_off, size: 64, color: Colors.grey),
                     SizedBox(height: 16),
                     Text(
                       'Produto não encontrado',
@@ -101,14 +53,12 @@ class ProductInfoPage extends StatelessWidget {
             );
           }
 
-          final data = snapshot.data!.data()!;
-          final productId = this.productId;
+          final product = snapshot.data!;
           final favoritesProvider = Provider.of<FavoritesProvider>(context);
           final isFavorited = favoritesProvider.favoriteIds.contains(productId);
 
           return CustomScrollView(
             slivers: [
-              // Modern App Bar with Product Image
               SliverAppBar(
                 expandedHeight: 350.0,
                 pinned: true,
@@ -119,22 +69,24 @@ class ProductInfoPage extends StatelessWidget {
                   background: Stack(
                     fit: StackFit.expand,
                     children: [
-                      // Product Image
-                      data['image_url'] != null
+                      product.imageUrl != null
                           ? Image.network(
-                              data['image_url'],
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  Image.asset(
-                                _getCategoryImage(data['categoria']),
-                                fit: BoxFit.cover,
-                              ),
-                            )
+                            product.imageUrl!,
+                            fit: BoxFit.cover,
+                            errorBuilder:
+                                (context, error, stackTrace) => Image.asset(
+                                  _productController.getCategoryImage(
+                                    product.category,
+                                  ),
+                                  fit: BoxFit.cover,
+                                ),
+                          )
                           : Image.asset(
-                              _getCategoryImage(data['categoria']),
-                              fit: BoxFit.cover,
+                            _productController.getCategoryImage(
+                              product.category,
                             ),
-                      // Gradient Overlay
+                            fit: BoxFit.cover,
+                          ),
                       Container(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
@@ -159,10 +111,13 @@ class ProductInfoPage extends StatelessWidget {
                     ),
                     child: Consumer<FavoritesProvider>(
                       builder: (context, favoritesProvider, _) {
-                        final isFavorited = favoritesProvider.favoriteIds.contains(productId);
+                        final isFavorited = favoritesProvider.favoriteIds
+                            .contains(productId);
                         return IconButton(
                           icon: Icon(
-                            isFavorited ? Icons.favorite : Icons.favorite_border,
+                            isFavorited
+                                ? Icons.favorite
+                                : Icons.favorite_border,
                             color: Colors.white,
                           ),
                           onPressed: () {
@@ -175,7 +130,6 @@ class ProductInfoPage extends StatelessWidget {
                 ],
               ),
 
-              // Product Information
               SliverToBoxAdapter(
                 child: Container(
                   decoration: const BoxDecoration(
@@ -187,9 +141,12 @@ class ProductInfoPage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Price Badge
                       Container(
-                        margin: const EdgeInsets.only(top: 16, left: 24, right: 24),
+                        margin: const EdgeInsets.only(
+                          top: 16,
+                          left: 24,
+                          right: 24,
+                        ),
                         child: Row(
                           children: [
                             Container(
@@ -213,8 +170,8 @@ class ProductInfoPage extends StatelessWidget {
                             ),
                             const Spacer(),
                             Text(
-                              data['preco'] != null
-                                  ? 'R\$ ${double.parse(data['preco'].toString()).toStringAsFixed(2).replaceAll('.', ',')}'
+                              product.price != null
+                                  ? 'R\$ ${product.price!.toStringAsFixed(2).replaceAll('.', ',')}'
                                   : 'R\$ 0,00',
                               style: const TextStyle(
                                 fontSize: 28,
@@ -226,12 +183,11 @@ class ProductInfoPage extends StatelessWidget {
                         ),
                       ),
 
-                      // Product Name
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 24),
                         margin: const EdgeInsets.only(top: 16),
                         child: Text(
-                          data['nome'] ?? 'Produto sem nome',
+                          product.name ?? 'Produto sem nome',
                           style: const TextStyle(
                             fontSize: 26,
                             fontWeight: FontWeight.bold,
@@ -241,29 +197,28 @@ class ProductInfoPage extends StatelessWidget {
                         ),
                       ),
 
-                      // Market and Category Info
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 24),
                         margin: const EdgeInsets.only(top: 12),
                         child: Row(
                           children: [
-                            _buildInfoChip(
+                            buildInfoChip(
                               icon: Icons.store_outlined,
-                              label: data['mercado'] ?? 'Mercado',
+                              label: product.market ?? 'Mercado',
                               color: Colors.blue,
                             ),
                             const SizedBox(width: 12),
-                            _buildInfoChip(
+                            buildInfoChip(
                               icon: Icons.category_outlined,
-                              label: data['categoria'] ?? 'Categoria',
+                              label: product.category ?? 'Categoria',
                               color: Colors.purple,
                             ),
                           ],
                         ),
                       ),
 
-                      // Description Section
-                      if (data['descricao'] != null && data['descricao'].toString().isNotEmpty)
+                      if (product.description != null &&
+                          product.description!.isNotEmpty)
                         Container(
                           padding: const EdgeInsets.all(24),
                           child: Column(
@@ -279,7 +234,7 @@ class ProductInfoPage extends StatelessWidget {
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                data['descricao'],
+                                product.description!,
                                 style: TextStyle(
                                   fontSize: 16,
                                   color: Colors.grey[700],
@@ -290,7 +245,6 @@ class ProductInfoPage extends StatelessWidget {
                           ),
                         ),
 
-                      // Additional Information
                       Container(
                         margin: const EdgeInsets.symmetric(horizontal: 24),
                         padding: const EdgeInsets.all(20),
@@ -310,42 +264,43 @@ class ProductInfoPage extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 16),
-                            _buildInfoRow(
+                            buildInfoRow(
                               icon: Icons.calendar_today_outlined,
                               label: 'Data de Adição',
-                              value: _formatDate(data['dataAdicionado']),
+                              value: _productController.formatDate(
+                                product.addedDate,
+                              ),
                             ),
-                            if (data['validade'] != null) ...[
+                            if (product.expirationDate != null) ...[
                               const SizedBox(height: 12),
-                              _buildInfoRow(
+                              buildInfoRow(
                                 icon: Icons.schedule_outlined,
                                 label: 'Válido até',
-                                value: _formatDate(data['validade']),
+                                value: _productController.formatDate(
+                                  product.expirationDate,
+                                ),
                               ),
                             ],
-                            if (data['desconto'] != null) ...[
+                            if (product.discount != null) ...[
                               const SizedBox(height: 12),
-                              _buildInfoRow(
+                              buildInfoRow(
                                 icon: Icons.local_offer_outlined,
                                 label: 'Desconto',
-                                value: '${data['desconto']}%',
+                                value: '${product.discount}%',
                               ),
                             ],
-                            if (data['precoOriginal'] != null) ...[
+                            if (product.originalPrice != null) ...[
                               const SizedBox(height: 12),
-                              _buildInfoRow(
+                              buildInfoRow(
                                 icon: Icons.money_off_outlined,
                                 label: 'Preço Original',
-                                value: 'R\$ ${double.parse(data['precoOriginal'].toString()).toStringAsFixed(2).replaceAll('.', ',')}',
+                                value:
+                                    'R\$ ${product.originalPrice!.toStringAsFixed(2).replaceAll('.', ',')}',
                               ),
                             ],
                           ],
                         ),
                       ),
-
-
-
-                      // Bottom spacing
                       const SizedBox(height: 20),
                     ],
                   ),
@@ -355,66 +310,6 @@ class ProductInfoPage extends StatelessWidget {
           );
         },
       ),
-    );
-  }
-
-  Widget _buildInfoChip({
-    required IconData icon,
-    required String label,
-    required Color color,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.3)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 16, color: color),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: TextStyle(
-              color: color,
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInfoRow({
-    required IconData icon,
-    required String label,
-    required String value,
-  }) {
-    return Row(
-      children: [
-        Icon(icon, size: 18, color: Colors.grey[600]),
-        const SizedBox(width: 12),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 15,
-            color: Colors.grey[600],
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const Spacer(),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 15,
-            color: Colors.black87,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ],
     );
   }
 }

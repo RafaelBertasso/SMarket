@@ -1,8 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:smarket/components/navbar.dart';
-import 'package:smarket/providers/favorites.provider.dart';
 import 'package:smarket/screens/category.page.dart';
 import 'package:smarket/screens/favorites.page.dart';
 import 'package:smarket/screens/forgot.password.page.dart';
