@@ -50,11 +50,9 @@ class FavoritesProvider extends ChangeNotifier {
     } else {
       await favDoc.set({'createdAt': FieldValue.serverTimestamp()});
     }
-    // Force update in case snapshot is delayed
     notifyListeners();
   }
 
-  // For debugging
   Future<void> refresh() async {
     _listenToFavorites();
   }
