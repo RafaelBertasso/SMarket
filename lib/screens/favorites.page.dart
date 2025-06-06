@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../providers/favorites.provider.dart';
-import '../widgets/product.card.dart';
+import '../components/product.card.dart';
 
 class FavoritesPage extends StatelessWidget {
   FavoritesPage({super.key});

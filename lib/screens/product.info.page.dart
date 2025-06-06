@@ -94,7 +94,7 @@ class ProductInfoPage extends StatelessWidget {
                             end: Alignment.bottomCenter,
                             colors: [
                               Colors.transparent,
-                              Colors.black.withOpacity(0.3),
+                              const Color.fromARGB(87, 0, 0, 0),
                             ],
                           ),
                         ),
@@ -106,7 +106,7 @@ class ProductInfoPage extends StatelessWidget {
                   Container(
                     margin: const EdgeInsets.only(right: 16),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: const Color.fromARGB(90, 255, 255, 255),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Consumer<FavoritesProvider>(
