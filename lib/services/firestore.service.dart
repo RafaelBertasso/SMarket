@@ -12,8 +12,10 @@ class FirestoreService {
     required String market,
   }) async {
     try {
+      final nameLower = name.toLowerCase();
       await productsCollection.add({
         'nome': name.trim(),
+        'nomeLower': nameLower.trim(),
         'descricao': description.trim(),
         'preco': price.trim(),
         'categoria': category.toLowerCase().trim(),
@@ -24,5 +26,16 @@ class FirestoreService {
     } catch (_) {
       throw Exception('Erro ao adicionar produto ao Firestore');
     }
+  }
+  Future<QuerySnapshot> searchProducts(String query) async{
+    final searchTerm = query.toLowerCase().trim();
+    if (searchTerm.isEmpty) {
+      return await productsCollection.limit(1).get();
+    }
+    return productsCollection
+        .where('nomeLower', isGreaterThanOrEqualTo: searchTerm)
+        .where('nomeLower', isLessThanOrEqualTo: '$searchTerm\uf8ff')
+        .limit(10)
+        .get();
   }
 }

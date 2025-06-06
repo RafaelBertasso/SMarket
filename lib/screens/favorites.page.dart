@@ -23,15 +23,18 @@ class FavoritesPage extends StatelessWidget {
           }
 
           return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-            stream: _db
-                .collection('produtos')
-                .where(FieldPath.documentId, whereIn: favoriteIds.toList())
-                .snapshots(),
+            stream:
+                _db
+                    .collection('produtos')
+                    .where(FieldPath.documentId, whereIn: favoriteIds.toList())
+                    .snapshots(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(
                   child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.deepOrange),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Colors.deepOrange,
+                    ),
                   ),
                 );
               }
@@ -45,7 +48,10 @@ class FavoritesPage extends StatelessWidget {
                 itemCount: snapshot.data!.docs.length,
                 itemBuilder: (context, index) {
                   final doc = snapshot.data!.docs[index];
-                  return ProductCard(doc: doc, favoritesProvider: favoritesProvider);
+                  return ProductCard(
+                    doc: doc,
+                    favoritesProvider: favoritesProvider,
+                  );
                 },
               );
             },
@@ -57,6 +63,7 @@ class FavoritesPage extends StatelessWidget {
 
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
+      centerTitle: true,
       backgroundColor: Colors.white,
       elevation: 0,
       leading: IconButton(
@@ -65,38 +72,10 @@ class FavoritesPage extends StatelessWidget {
       ),
       title: Text(
         'Favoritos',
-        style: GoogleFonts.inter(
+        style: GoogleFonts.poppins(
           color: Colors.black87,
           fontSize: 20,
           fontWeight: FontWeight.w600,
-        ),
-      ),
-      bottom: PreferredSize(
-        preferredSize: const Size.fromHeight(70),
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(25),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.search, color: Colors.grey[500]),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: TextField(
-                    style: GoogleFonts.inter(),
-                    decoration: const InputDecoration(
-                      hintText: 'Pesquisar nos favoritos',
-                      border: InputBorder.none,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
         ),
       ),
     );
@@ -107,11 +86,7 @@ class FavoritesPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.favorite_border,
-            size: 80,
-            color: Colors.grey[400],
-          ),
+          Icon(Icons.favorite_border, size: 80, color: Colors.grey[400]),
           const SizedBox(height: 16),
           Text(
             'Nenhum produto favorito',
@@ -124,10 +99,7 @@ class FavoritesPage extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             'Adicione produtos aos favoritos para vê-los aqui',
-            style: GoogleFonts.inter(
-              fontSize: 14,
-              color: Colors.grey[500],
-            ),
+            style: GoogleFonts.inter(fontSize: 14, color: Colors.grey[500]),
             textAlign: TextAlign.center,
           ),
         ],
