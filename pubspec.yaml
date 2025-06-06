@@ -85,9 +85,16 @@ flutter:
   - 'assets/images/smarket-logo.png'
   - 'assets/images/promo.png'
   - 'assets/images/google_icon.png'
-  - 'assets/images/cafe.png'
   - 'assets/images/map_bg.jpg'
   - 'assets/images/success.png'
+  - 'assets/images/acougue.png'
+  - 'assets/images/bebidas.png'
+  - 'assets/images/default.png'
+  - 'assets/images/feirinha.png'
+  - 'assets/images/higiene.png'
+  - 'assets/images/limpeza.png'
+  - 'assets/images/massas.png'
+  - 'assets/images/pet.png'
   - .env
 
 

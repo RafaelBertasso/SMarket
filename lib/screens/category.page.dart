@@ -2,7 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+
 import 'package:smarket/controllers/markets.controller.dart';
+import 'package:smarket/providers/favorites.provider.dart';
+import 'package:smarket/screens/product.info.page.dart';
 
 class CategoryPage extends StatefulWidget {
   final String categoryName;
@@ -143,8 +147,6 @@ class _CategoryPageState extends State<CategoryPage> {
 
   Widget _buildProductItem(DocumentSnapshot doc) {
     final product = doc.data() as Map<String, dynamic>;
-    final isFavorited =
-        (product['favoritadoPor'] as List?)?.contains(userId) ?? false;
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -164,39 +166,31 @@ class _CategoryPageState extends State<CategoryPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [Text('R\$ ${product['preco']}'), Text(product['mercado'])],
         ),
-        trailing: IconButton(
-          icon: Icon(
-            isFavorited ? Icons.favorite : Icons.favorite_border,
-            color: isFavorited ? Colors.red : null,
-          ),
-          onPressed: () => _toggleFavorite(doc.id, isFavorited),
+        trailing: Consumer<FavoritesProvider>(
+          builder: (context, favoritesProvider, _) {
+            final isFavorited = favoritesProvider.favoriteIds.contains(doc.id);
+            return IconButton(
+              icon: Icon(
+                isFavorited ? Icons.favorite : Icons.favorite_border,
+                color: isFavorited ? Colors.red : null,
+              ),
+              onPressed: () {
+                favoritesProvider.toggleFavorite(doc.id);
+              },
+            );
+          },
         ),
         onTap: () {
-          // Navegar para detalhes do produto se necessário
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => 
+                ProductInfoPage(productId: doc.id),
+            ),
+          );
         },
       ),
     );
-  }
-
-  Future<void> _toggleFavorite(
-    String productId,
-    bool isCurrentlyFavorited,
-  ) async {
-    if (userId == null) return;
-
-    final docRef = FirebaseFirestore.instance
-        .collection('produtos')
-        .doc(productId);
-
-    if (isCurrentlyFavorited) {
-      await docRef.update({
-        'favoritadoPor': FieldValue.arrayRemove([userId]),
-      });
-    } else {
-      await docRef.update({
-        'favoritadoPor': FieldValue.arrayUnion([userId]),
-      });
-    }
   }
 
   Future<void> _showFilterDialog() async {

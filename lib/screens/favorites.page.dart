@@ -1,6 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import '../providers/favorites.provider.dart';
+import '../widgets/product.card.dart';
 
 class FavoritesPage extends StatelessWidget {
   FavoritesPage({super.key});
@@ -9,134 +12,125 @@ class FavoritesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pushNamed(context, '/main');
-          },
+      backgroundColor: Colors.grey[50],
+      appBar: _buildAppBar(context),
+      body: Consumer<FavoritesProvider>(
+        builder: (context, favoritesProvider, child) {
+          final favoriteIds = favoritesProvider.favoriteIds;
+
+          if (favoriteIds.isEmpty) {
+            return _buildEmptyState();
+          }
+
+          return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+            stream: _db
+                .collection('produtos')
+                .where(FieldPath.documentId, whereIn: favoriteIds.toList())
+                .snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.deepOrange),
+                  ),
+                );
+              }
+
+              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                return _buildEmptyState();
+              }
+
+              return ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: snapshot.data!.docs.length,
+                itemBuilder: (context, index) {
+                  final doc = snapshot.data!.docs[index];
+                  return ProductCard(doc: doc, favoritesProvider: favoritesProvider);
+                },
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  AppBar _buildAppBar(BuildContext context) {
+    return AppBar(
+      backgroundColor: Colors.white,
+      elevation: 0,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back, color: Colors.black87),
+        onPressed: () => Navigator.pushNamed(context, '/main'),
+      ),
+      title: Text(
+        'Favoritos',
+        style: GoogleFonts.inter(
+          color: Colors.black87,
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
         ),
-        title: Container(
-          padding: EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(
-            color: const Color.fromARGB(106, 199, 199, 199),
-            borderRadius: BorderRadius.circular(30),
-          ),
-          child: Row(
-            children: [
-              Icon(
-                Icons.search,
-                color: const Color.fromARGB(255, 207, 202, 202),
-              ),
-              SizedBox(width: 8),
-              Expanded(
-                child: TextField(
-                  style: GoogleFonts.inter(),
-                  decoration: InputDecoration(
-                    hintText: 'Pesquisar Produtos',
-                    border: InputBorder.none,
+      ),
+      bottom: PreferredSize(
+        preferredSize: const Size.fromHeight(70),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            decoration: BoxDecoration(
+              color: Colors.grey[100],
+              borderRadius: BorderRadius.circular(25),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.search, color: Colors.grey[500]),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: TextField(
+                    style: GoogleFonts.inter(),
+                    decoration: const InputDecoration(
+                      hintText: 'Pesquisar nos favoritos',
+                      border: InputBorder.none,
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
+    );
+  }
 
-      body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-        stream: _db.collection('produtos').snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          }
-
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return Center(child: Text('Nenhum produto encontrado.'));
-          }
-
-          return ListView(
-            children:
-                snapshot.data!.docs.map((doc) {
-                  final data = doc.data();
-                  return Container(
-                    height: 100,
-                    margin: EdgeInsets.all(8.0),
-                    padding: EdgeInsets.all(16.0),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8.0),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color.fromARGB(105, 158, 158, 158),
-                          spreadRadius: 2,
-                          blurRadius: 5,
-                          offset: Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 60,
-                          height: 60,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8.0),
-                            image: DecorationImage(
-                              image: NetworkImage(
-                                data['image_url'] ??
-                                    'https://via.placeholder.com/60',
-                              ),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-
-                        SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                data['nome'] ?? 'Produto sem nome',
-                                style: GoogleFonts.inter(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              SizedBox(height: 4),
-                              Text(
-                                data['descricao'] ?? 'Sem descrição.',
-                                style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  color: Colors.grey[600],
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        Container(
-                          width: 100,
-                          alignment: Alignment.center,
-                          child: Text(
-                            data['preco'] != null
-                                ? 'R\$ ${(data['preco'])}'
-                                : 'R\$ 0,00',
-                            style: GoogleFonts.inter(
-                              fontSize: 14,
-                              color: Colors.green[700],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList(),
-          );
-        },
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.favorite_border,
+            size: 80,
+            color: Colors.grey[400],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Nenhum produto favorito',
+            style: GoogleFonts.inter(
+              fontSize: 18,
+              color: Colors.grey[600],
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Adicione produtos aos favoritos para vê-los aqui',
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              color: Colors.grey[500],
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }
