@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-import 'package:smarket/controllers/markets.controller.dart';
 import 'package:smarket/providers/favorites.provider.dart';
 import 'package:smarket/screens/product.info.page.dart';
 
@@ -18,8 +17,7 @@ class CategoryPage extends StatefulWidget {
 
 class _CategoryPageState extends State<CategoryPage> {
   final userId = FirebaseAuth.instance.currentUser?.uid;
-  String _searchQuery = '';
-  String _selectedMarket = 'Todos';
+  String searchQuery = '';
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -33,30 +31,10 @@ class _CategoryPageState extends State<CategoryPage> {
           widget.categoryName,
           style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.w600),
         ),
-        actions: [
-          IconButton(
-            onPressed: () async {
-              await _showFilterDialog();
-            },
-            icon: Icon(Icons.filter_alt),
-          ),
-        ],
       ),
       body: Column(
         children: [
-          Padding(
-            padding: EdgeInsets.all(8),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: 'Pesquisar produtos',
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-              ),
-              onChanged: (value) => setState(() => _searchQuery = value),
-            ),
-          ),
+          SizedBox(height: 10),
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
               stream: _buildProductStream(),
@@ -90,28 +68,6 @@ class _CategoryPageState extends State<CategoryPage> {
                   );
                 }
 
-                if (snapshot.data == null || snapshot.data!.docs.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.search_off, size: 50),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Nenhum produto encontrado',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        Text(
-                          _selectedMarket != 'Todos'
-                              ? 'Filtros ativos: ${widget.categoryName} e $_selectedMarket'
-                              : 'Categoria: ${widget.categoryName}',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
                 final products = snapshot.data!.docs;
                 return ListView.builder(
                   itemCount: products.length,
@@ -134,13 +90,10 @@ class _CategoryPageState extends State<CategoryPage> {
         .where('categoria', isEqualTo: formattedCategory)
         .orderBy('dataAdicionado', descending: true);
 
-    if (_selectedMarket != 'Todos') {
-      query = query.where('mercado', isEqualTo: _selectedMarket);
-    }
-    if (_searchQuery.isNotEmpty) {
+    if (searchQuery.isNotEmpty) {
       query = query
-          .where('nome', isGreaterThanOrEqualTo: _searchQuery)
-          .where('nome', isLessThanOrEqualTo: '$_searchQuery\uf8ff');
+          .where('nome', isGreaterThanOrEqualTo: searchQuery)
+          .where('nome', isLessThanOrEqualTo: '$searchQuery\uf8ff');
     }
     return query.snapshots();
   }
@@ -184,131 +137,11 @@ class _CategoryPageState extends State<CategoryPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => 
-                ProductInfoPage(productId: doc.id),
+              builder: (context) => ProductInfoPage(productId: doc.id),
             ),
           );
         },
       ),
     );
-  }
-
-  Future<void> _showFilterDialog() async {
-    try {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => const Center(child: CircularProgressIndicator()),
-      );
-
-      final marketsController = MarketsController();
-      await marketsController.findMarketsOSM();
-
-      if (!mounted) return;
-      Navigator.pop(context);
-
-      if (!mounted) return;
-      await showDialog(
-        context: context,
-        builder: (context) {
-          String searchText = '';
-          List<String> filteredMarkets = ['Todos']..addAll(
-            marketsController.state.markets
-                .map((m) => m['name'].toString())
-                .toList(),
-          );
-
-          return StatefulBuilder(
-            builder: (context, setState) {
-              return AlertDialog(
-                title: const Text('Filtrar por mercado'),
-                content: SizedBox(
-                  width: double.maxFinite,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      TextField(
-                        decoration: const InputDecoration(
-                          hintText: 'Pesquisar mercado...',
-                          prefixIcon: Icon(Icons.search),
-                        ),
-                        onChanged: (value) {
-                          setState(() {
-                            searchText = value;
-                            filteredMarkets = ['Todos']..addAll(
-                              marketsController.state.markets
-                                  .where(
-                                    (market) => market['name']
-                                        .toString()
-                                        .toLowerCase()
-                                        .contains(value.toLowerCase()),
-                                  )
-                                  .map((m) => m['name'].toString())
-                                  .toList(),
-                            );
-                          });
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      Expanded(
-                        child:
-                            filteredMarkets.isEmpty
-                                ? const Center(
-                                  child: Text('Nenhum mercado encontrado'),
-                                )
-                                : ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: filteredMarkets.length,
-                                  itemBuilder: (context, index) {
-                                    return ListTile(
-                                      title: Text(filteredMarkets[index]),
-                                      onTap: () {
-                                        _selectedMarket =
-                                            filteredMarkets[index];
-                                        Navigator.pop(context);
-                                      },
-                                    );
-                                  },
-                                ),
-                      ),
-                    ],
-                  ),
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      _selectedMarket = 'Todos';
-                      Navigator.pop(context);
-                    },
-                    child: const Text('Limpar filtro'),
-                  ),
-                ],
-              );
-            },
-          );
-        },
-      );
-    } catch (e) {
-      if (mounted) Navigator.pop(context);
-
-      if (mounted) {
-        showDialog(
-          context: context,
-          builder:
-              (context) => AlertDialog(
-                title: const Text('Erro'),
-                content: Text(
-                  'Não foi possível carregar os mercados: ${e.toString()}',
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text('OK'),
-                  ),
-                ],
-              ),
-        );
-      }
-    }
   }
 }

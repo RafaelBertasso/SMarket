@@ -167,11 +167,9 @@ class _ScanPageState extends State<ScanPage> with WidgetsBindingObserver {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Container(
-          color: Colors.grey[900],
-          child: Center(child: _buildMainContent()),
-        ),
+      body: Container(
+        color: Colors.grey[900],
+        child: Center(child: _buildMainContent()),
       ),
     );
   }
@@ -193,98 +191,125 @@ class _ScanPageState extends State<ScanPage> with WidgetsBindingObserver {
   }
 
   Widget _buildInitialCameraUI() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(Icons.camera_alt, size: 80, color: Colors.white),
-        SizedBox(height: 20),
-        Text(
-          'Pronto para escanear promoções',
-          style: GoogleFonts.inter(
-            fontSize: 18,
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Spacer(flex: 2),
+            Icon(Icons.camera_alt, size: 100, color: Colors.white),
+            const SizedBox(height: 32),
+            Text(
+              'Escaneie promoções\nem segundos',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(
+                fontSize: 24,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                height: 1.3,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Aponte a câmera para o produto ou etiqueta de preço para identificar automaticamente',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(fontSize: 16, color: Colors.white70),
+            ),
+            const Spacer(flex: 3),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _requestCameraPermission,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 2,
+                ),
+                child: Text(
+                  'INICIAR CÂMERA',
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+          ],
         ),
-        SizedBox(height: 20),
-        ElevatedButton(
-          onPressed: _requestCameraPermission,
-          style: ElevatedButton.styleFrom(
-            padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-          ),
-          child: Text('Iniciar Câmera', style: GoogleFonts.inter(fontSize: 16)),
-        ),
-        SizedBox(height: 10),
-        TextButton(
-          onPressed: _showManualEntryDialog,
-          child: Text(
-            'Ou preencha manualmente',
-            style: GoogleFonts.inter(fontSize: 14, color: Colors.blueAccent),
-          ),
-        ),
-      ],
+      ),
     );
   }
 
   Widget _buildCameraUI() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Container(
-          width: size!.width - 50,
-          height: size!.height - (size!.height / 3),
-          child:
-              photo == null
-                  ? _cameraPreviewWidget()
-                  : Stack(
-                    children: [
-                      Image.file(File(photo!.path)),
-                      if (isLoading) Center(child: CircularProgressIndicator()),
-                    ],
-                  ),
-        ),
-        if (photo == null)
-          Padding(
-            padding: const EdgeInsets.only(top: 16),
-            child: ElevatedButton.icon(
-              onPressed: _showManualEntryDialog,
-              icon: Icon(Icons.edit),
-              label: Text(
-                'Preencher Manualmente',
-                style: GoogleFonts.inter(fontSize: 14),
-              ),
-              style: _buttonStyle(Colors.blueAccent),
-            ),
-          )
-        else
-          Padding(
-            padding: const EdgeInsets.only(top: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton.icon(
-                  onPressed: refazerFoto,
-                  icon: const Icon(Icons.refresh),
-                  label: Text(
-                    'Refazer Foto',
-                    style: GoogleFonts.inter(fontSize: 14),
-                  ),
-                  style: _buttonStyle(Colors.redAccent),
-                ),
-                const SizedBox(width: 16),
-                ElevatedButton.icon(
-                  onPressed: processPhoto,
-                  icon: const Icon(Icons.check_circle),
-                  label: Text(
-                    'Processar',
-                    style: GoogleFonts.inter(fontSize: 14),
-                  ),
-                  style: _buttonStyle(Colors.green),
-                ),
-              ],
-            ),
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: size!.width - 50,
+            height: size!.height - (size!.height / 3),
+            child:
+                photo == null
+                    ? _cameraPreviewWidget()
+                    : Stack(
+                      children: [
+                        Image.file(File(photo!.path)),
+                        if (isLoading)
+                          Center(child: CircularProgressIndicator()),
+                      ],
+                    ),
           ),
-      ],
+          if (photo == null)
+            Padding(
+              padding: const EdgeInsets.only(top: 16),
+              child: ElevatedButton.icon(
+                onPressed: _showManualEntryDialog,
+                icon: Icon(Icons.edit),
+                label: Text(
+                  'Preencher Manualmente',
+                  style: GoogleFonts.inter(fontSize: 14),
+                ),
+                style: _buttonStyle(Colors.blueAccent),
+              ),
+            )
+          else
+            Padding(
+              padding: const EdgeInsets.only(top: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: refazerFoto,
+                    icon: const Icon(Icons.refresh),
+                    label: Text(
+                      'Refazer Foto',
+                      style: GoogleFonts.inter(fontSize: 14),
+                    ),
+                    style: _buttonStyle(Colors.redAccent),
+                  ),
+                  const SizedBox(width: 16),
+                  ElevatedButton.icon(
+                    onPressed: processPhoto,
+                    icon: const Icon(Icons.check_circle),
+                    label: Text(
+                      'Processar',
+                      style: GoogleFonts.inter(fontSize: 14),
+                    ),
+                    style: _buttonStyle(Colors.green),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
     );
   }
 
@@ -416,9 +441,7 @@ class _ScanPageState extends State<ScanPage> with WidgetsBindingObserver {
             'nome': result['name'] ?? '',
             'descricao': result['description'] ?? '',
             'preco': finalPrice,
-            'categoria':
-                result['category']?.toLowerCase() ??
-                'outros',
+            'categoria': result['category']?.toLowerCase() ?? 'outros',
             'mercado': result['market'] ?? '',
             'dataAdicionado': FieldValue.serverTimestamp(),
             'favoritadoPor': [],
