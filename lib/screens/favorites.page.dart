@@ -301,50 +301,25 @@ class _FavoritesPageState extends State<FavoritesPage> {
     );
   }
 
-  Widget _buildPriceAndFavorite(
-    Map<String, dynamic> data,
-    String productId,
-    FavoritesProvider favoritesProvider,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Text(
-          data['preco'] != null
-              ? 'R\$ ${double.parse(data['preco'].toString()).toStringAsFixed(2).replaceAll('.', ',')}'
-              : 'R\$ 0,00',
-          style: GoogleFonts.inter(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.deepOrange,
-          ),
-        ),
-        const SizedBox(height: 8),
-        AnimatedScale(
-          scale: 1.0,
-          duration: const Duration(milliseconds: 150),
-          child: IconButton(
-            onPressed: () => _toggleFavorite(favoritesProvider, productId),
-            icon: const Icon(
-              Icons.favorite,
-              color: Colors.red,
-              size: 24,
-            ),
-            style: IconButton.styleFrom(
-              backgroundColor: Colors.red.shade50,
-              padding: const EdgeInsets.all(8),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  void _navigateToProduct(BuildContext context, String productId) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ProductInfoPage(productId: productId),
+                        Container(
+                          width: 100,
+                          alignment: Alignment.center,
+                          child: Text(
+                            data['preco'] != null
+                                ? 'R\$ ${double.parse(data['preco']).toStringAsFixed(2)}'
+                                : 'R\$ 0,00',
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              color: Colors.green[700],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+          );
+        },
       ),
     );
   }

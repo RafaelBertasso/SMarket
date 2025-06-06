@@ -16,9 +16,10 @@ class ProductAIService {
     final model = GenerativeModel(model: 'gemini-1.5-flash', apiKey: apiKey);
 
     final prompt = TextPart(
-      'Analise a imagem de um produto e retorne nome, descrição e preço no formato JSON.\n'
-      'Exemplo: {"name": "Arroz Tio João", "description": "Arroz branco tipo 1, pacote de 1kg", "price": "7.99"}.\n'
-      'Se não conseguir identificar, retorne {"name": "", "description": "", "price": ""}.',
+      'Analise a imagem de um produto e retorne nome, descrição, preço e categoria no formato JSON.\n'
+      'Exemplo: {"name": "Arroz Tio João", "description": "Arroz branco tipo 1, pacote de 1kg", "price": "7.99", "category": "Massas"}.\n'
+      'As categorias possíveis são: "Açougue", "Bebidas", "Feirinha", "Higiene", "Limpeza", "Massas", "Pet".\n'
+      'Se não conseguir identificar algum campo, retorne-o vazio, como {"name": "", "description": "", "price": "", "category": ""}.',
     );
 
     final imagePart = DataPart('image/jpeg', image);
