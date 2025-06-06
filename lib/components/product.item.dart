@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
+import '../providers/favorites.provider.dart';
 
 class ProductItem extends StatelessWidget {
   final DocumentSnapshot doc;
@@ -18,8 +20,6 @@ class ProductItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final product = doc.data() as Map<String, dynamic>;
-    final isFavorited =
-        (product['favoritadoPor'] as List?)?.contains(userId) ?? false;
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -42,12 +42,17 @@ class ProductItem extends StatelessWidget {
             Text(product['mercado']),
           ],
         ),
-        trailing: IconButton(
-          icon: Icon(
-            isFavorited ? Icons.favorite : Icons.favorite_border,
-            color: isFavorited ? Colors.red : null,
-          ),
-          onPressed: () => onFavoritePressed(doc.id, isFavorited),
+        trailing: Consumer<FavoritesProvider>(
+          builder: (context, favoritesProvider, _) {
+            final isFavorited = favoritesProvider.favoriteIds.contains(doc.id);
+            return IconButton(
+              icon: Icon(
+                isFavorited ? Icons.favorite : Icons.favorite_border,
+                color: isFavorited ? Colors.red : null,
+              ),
+              onPressed: () => favoritesProvider.toggleFavorite(doc.id),
+            );
+          },
         ),
         onTap: onTap,
       ),

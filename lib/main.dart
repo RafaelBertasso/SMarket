@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
+import 'package:smarket/providers/favorites.provider.dart';
 import 'package:smarket/components/market.filter.dart';
 import 'package:smarket/firebase_options.dart';
 import 'package:smarket/screens/smarket.app.page.dart';
@@ -13,7 +14,10 @@ void main() async {
 
   runApp(
     MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => MarketFilter())],
+      providers: [
+        ChangeNotifierProvider(create: (_) => MarketFilter()),
+        ChangeNotifierProvider(create: (_) => FavoritesProvider()),
+      ],
       child: SMarketApp(),
     ),
   );
