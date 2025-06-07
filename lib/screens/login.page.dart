@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:smarket/components/custom.button.dart';
 
 class LoginPage extends StatelessWidget {
@@ -26,32 +25,6 @@ class LoginPage extends StatelessWidget {
       Navigator.pushReplacementNamed(context, '/main');
     } on FirebaseAuthException catch (_) {
       final snackBar = SnackBar(content: Text('Usuário ou senha inválidos'));
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    }
-  }
-
-  Future<void> _loginWithGoogle(BuildContext context) async {
-    try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      final GoogleSignInAuthentication? googleAuth =
-          await googleUser?.authentication;
-
-      if (googleAuth != null) {
-        final credential = GoogleAuthProvider.credential(
-          accessToken: googleAuth.accessToken,
-          idToken: googleAuth.idToken,
-        );
-        UserCredential userCredential = await _auth.signInWithCredential(
-          credential,
-        );
-      }
-      if (_auth.currentUser != null) {
-        Navigator.pushReplacementNamed(context, '/main');
-      }
-    } on FirebaseAuthException catch (_) {
-      final snackBar = SnackBar(
-        content: Text('Erro ao fazer login com o Google'),
-      );
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
   }
@@ -120,6 +93,7 @@ class LoginPage extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
+                    SizedBox(height: 8),
                     ValueListenableBuilder(
                       valueListenable: _obscurePassword,
                       builder: (context, value, child) {
@@ -142,7 +116,6 @@ class LoginPage extends StatelessWidget {
                         );
                       },
                     ),
-                    SizedBox(height: 8),
                   ],
                 ),
                 Row(
@@ -154,73 +127,85 @@ class LoginPage extends StatelessWidget {
                       },
                       child: Text(
                         'Esqueci minha senha',
-                        style: TextStyle(color: Colors.blue),
+                        style: TextStyle(
+                          color: Colors.blue.shade700,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,),
                       ),
                     ),
                   ],
                 ),
+                SizedBox(height: 20),
                 CustomButton(
                   text: 'Acessar',
                   onPressed: () {
                     _login(context);
                   },
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Divider(color: Colors.grey, thickness: 1),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Text(
-                          'Ou acesse usando',
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      ),
-                      Expanded(
-                        child: Divider(color: Colors.grey, thickness: 1),
-                      ),
-                    ],
-                  ),
-                ),
-                OutlinedButton.icon(
-                  onPressed: () {
-                    _loginWithGoogle(context);
-                  },
-                  icon: Image.asset(
-                    'assets/images/google_icon.png',
-                    height: 24,
-                    width: 24,
-                  ),
-                  label: Text(
-                    'Entrar com Google',
-                    style: TextStyle(color: Colors.black),
-                  ),
-                  style: OutlinedButton.styleFrom(
-                    minimumSize: Size(double.infinity, 50),
-                    side: BorderSide(color: Colors.grey),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                Column(
                   children: [
-                    Text('Não tem uma conta?'),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/register');
-                      },
-                      child: Text(
-                        'Registrar',
-                        style: TextStyle(color: Colors.blue),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Divider(color: Colors.grey, thickness: 1),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0,
+                            ),
+                            child: Text(
+                              'Ou cadastre-se clicando abaixo',
+                              style: TextStyle(color: Colors.grey.shade600),
+                            ),
+                          ),
+                          Expanded(
+                            child: Divider(color: Colors.grey, thickness: 1),
+                          ),
+                        ],
                       ),
                     ),
                   ],
+                ),
+                Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Não tem uma conta?',
+                        style: TextStyle(
+                          color: Colors.grey.shade700,
+                          fontSize: 14,
+                        ),
+                      ),
+                      SizedBox(width: 4),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/register');
+                        },
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          minimumSize: Size(0, 0),
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: Text(
+                          'Crie uma agora',
+                          style: TextStyle(
+                            color: Colors.blue.shade700,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
