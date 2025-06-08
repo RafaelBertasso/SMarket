@@ -7,6 +7,7 @@ class Product {
   final String? descricao;
   final double preco;
   final String mercado;
+  final String mercadoEndereco;
   final String categoria;
   final DateTime dataAdicionado;
 
@@ -16,6 +17,7 @@ class Product {
     this.descricao,
     required this.preco,
     required this.mercado,
+    required this.mercadoEndereco,
     required this.categoria,
     required this.dataAdicionado,
   });
@@ -28,6 +30,7 @@ class Product {
       descricao: data['descricao'],
       preco: double.tryParse(data['preco'].toString()) ?? 0.0,
       mercado: data['mercado'] ?? 'Mercado não informado',
+      mercadoEndereco: data['mercadoEndereco'] ?? 'Endereço não informado',
       categoria: data['categoria'] ?? 'outros',
       dataAdicionado: (data['dataAdicionado'] as Timestamp).toDate(),
     );

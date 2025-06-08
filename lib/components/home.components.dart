@@ -317,9 +317,26 @@ Widget _buildProductCard(Product product) {
                 ),
               ),
               const Spacer(),
-              Text(
-                product.mercado,
-                style: GoogleFonts.inter(fontSize: 12, color: Colors.grey[600]),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    product.mercado,
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  Text(
+                    product.mercadoEndereco,
+                    style: GoogleFonts.inter(
+                      fontSize: 10,
+                      color: Colors.grey[500],
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
             ],
           ),

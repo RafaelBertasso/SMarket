@@ -286,4 +286,59 @@ out center;
     _updateState(_state.copyWith(destination: marketLocation));
     await fetchRoute();
   }
+
+  Future<List<Map<String, dynamic>>> getNearbyMarkets() async {
+    if (_state.currentLocation == null) {
+      await _initializeLocation();
+    }
+    if (_state.currentLocation == null) {
+      return [];
+    }
+
+    final radius = 1000;
+    final lat = _state.currentLocation!.latitude;
+    final lon = _state.currentLocation!.longitude;
+
+    final query = '''
+[out:json];
+(
+node["shop"="supermarket"](around:$radius,$lat,$lon);
+way["shop"="supermarket"](around:$radius,$lat,$lon);
+relation["shop"="supermarket"](around:$radius,$lat,$lon);
+);
+out center;
+''';
+    try {
+      final url = Uri.parse("https://overpass-api.de/api/interpreter");
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: "data=$query",
+      );
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final elements = data['elements'] as List<dynamic>;
+        final List<Map<String, dynamic>> nearbyMarkets = [];
+
+        for (var e in elements) {
+          final lat = e['lat'] ?? e['center']['lat'];
+          final lon = e['lon'] ?? e['center']['lon'];
+          final location = LatLng(lat, lon);
+
+          final fullAddress = await getAddressFromCoordinates(location);
+          final road = fullAddress.split(',').first.trim();
+
+          nearbyMarkets.add({
+            "name": e['tags']?['name']?.toString() ?? 'Supermercado',
+            "location": location,
+            "address": road.isNotEmpty ? road : 'Endereço não disponível',
+          });
+        }
+        return nearbyMarkets;
+      }
+      return [];
+    } catch (e) {
+      return [];
+    }
+  }
 }
