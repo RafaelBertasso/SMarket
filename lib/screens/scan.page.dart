@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'package:smarket/components/product.dialog.dart';
+import 'package:smarket/controllers/markets.controller.dart';
 import 'package:smarket/models/currency.input.formatter.dart';
 import 'package:smarket/services/firestore.service.dart';
 import 'package:smarket/services/product.ai.service.dart';
@@ -420,8 +421,10 @@ class _ScanPageState extends State<ScanPage> with WidgetsBindingObserver {
       final productData = await aiService.predictProduct(bytes);
 
       if (productData != null) {
+        var marketsController = MarketsController();
         final result = await showProductDialog(
           context,
+          marketsController: marketsController,
           name: productData['name'] ?? 'Nome do produto não encontrado',
           description: productData['description'] ?? 'Descrição não encontrada',
           price: productData['price'] ?? 'Preço não encontrado',
@@ -443,6 +446,7 @@ class _ScanPageState extends State<ScanPage> with WidgetsBindingObserver {
             'preco': finalPrice,
             'categoria': result['category']?.toLowerCase() ?? 'outros',
             'mercado': result['market'] ?? '',
+            'mercadoEndereco': result['marketAddress'] ?? '',
             'dataAdicionado': FieldValue.serverTimestamp(),
             'favoritadoPor': [],
           });
@@ -480,7 +484,8 @@ class _ScanPageState extends State<ScanPage> with WidgetsBindingObserver {
   void _showManualEntryDialog() {
     final formKey = GlobalKey<FormState>();
     final priceController = TextEditingController();
-    final marketController = TextEditingController();
+    final marketsController = MarketsController();
+    ValueNotifier<Map<String, dynamic>?> selectedMarket = ValueNotifier(null);
 
     final List<String> categories = [
       'Açougue',
@@ -497,29 +502,6 @@ class _ScanPageState extends State<ScanPage> with WidgetsBindingObserver {
     String? price;
     String? market;
     String? category;
-
-    Future<List<String>> _fetchMarkets(String query) async {
-      try {
-        final snapshot =
-            await FirebaseFirestore.instance
-                .collection('produtos')
-                .where('mercado', isGreaterThanOrEqualTo: query)
-                .where('mercado', isLessThanOrEqualTo: '$query\uf8ff')
-                .limit(5)
-                .get();
-
-        final markets =
-            snapshot.docs
-                .map((doc) => doc['mercado'] as String)
-                .toSet()
-                .toList();
-
-        return markets;
-      } catch (e) {
-        debugPrint('Erro ao buscar mercados: $e');
-        return [];
-      }
-    }
 
     showDialog(
       context: context,
@@ -601,21 +583,143 @@ class _ScanPageState extends State<ScanPage> with WidgetsBindingObserver {
                     ),
                     const SizedBox(height: 16),
 
-                    TextFormField(
-                      controller: marketController,
-                      decoration: InputDecoration(
-                        labelText: 'Mercado',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        prefixIcon: const Icon(Icons.store),
-                      ),
-                      onSaved: (value) => market = value,
-                      validator:
-                          (value) =>
-                              value == null || value.isEmpty
-                                  ? 'Campo obrigatório'
-                                  : null,
+                    FutureBuilder<List<Map<String, dynamic>>>(
+                      future: marketsController.getNearbyMarkets(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+
+                        final markets = snapshot.data ?? [];
+
+                        if (markets.isNotEmpty) {
+                          final existingMarket = markets.firstWhere(
+                            (m) => m['name'] == market,
+                            orElse: () => {},
+                          );
+
+                          if (existingMarket.isNotEmpty) {
+                            selectedMarket.value = existingMarket;
+                          } else {
+                            markets.insert(0, {
+                              'name': market,
+                              'distance': 0,
+                              'location': null,
+                            });
+                          }
+                        }
+
+                        return ValueListenableBuilder<Map<String, dynamic>?>(
+                          valueListenable: selectedMarket,
+                          builder: (context, value, child) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                DropdownButtonFormField<Map<String, dynamic>>(
+                                  value: value,
+                                  decoration: InputDecoration(
+                                    labelText: 'Mercado',
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    prefixIcon: const Icon(Icons.store),
+                                  ),
+                                  items: [
+                                    const DropdownMenuItem(
+                                      value: null,
+                                      child: Text('Escolha um mercado'),
+                                    ),
+                                    ...markets.map((market) {
+                                      return DropdownMenuItem<
+                                        Map<String, dynamic>
+                                      >(
+                                        value: market,
+                                        child: Text(
+                                          '${market['name']} - ${market['address']}',
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                        ),
+                                      );
+                                    }),
+                                  ],
+                                  onChanged: (newValue) async {
+                                    if (newValue == null) {
+                                      final manualMarket = await showDialog<
+                                        Map<String, dynamic>
+                                      >(
+                                        context: context,
+                                        builder: (context) {
+                                          final textController =
+                                              TextEditingController();
+                                          return AlertDialog(
+                                            title: const Text(
+                                              'Digite o nome do mercado',
+                                            ),
+                                            content: TextField(
+                                              controller: textController,
+                                              decoration: const InputDecoration(
+                                                labelText: 'Nome do mercado',
+                                              ),
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                onPressed:
+                                                    () =>
+                                                        Navigator.pop(context),
+                                                child: const Text('Cancelar'),
+                                              ),
+                                              TextButton(
+                                                onPressed: () {
+                                                  if (textController
+                                                      .text
+                                                      .isNotEmpty) {
+                                                    Navigator.pop(context, {
+                                                      'name':
+                                                          textController.text,
+                                                      'distance': 0,
+                                                      'location': null,
+                                                    });
+                                                  }
+                                                },
+                                                child: const Text('Confirmar'),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+
+                                      if (manualMarket != null) {
+                                        selectedMarket.value = manualMarket;
+                                      }
+                                    } else {
+                                      selectedMarket.value = newValue;
+                                    }
+                                  },
+                                  validator:
+                                      (value) =>
+                                          value == null
+                                              ? 'Campo obrigatório'
+                                              : null,
+                                  hint: const Text('Selecione um mercado'),
+                                  isExpanded: true,
+                                ),
+                                const SizedBox(height: 8),
+                                if (markets.isEmpty)
+                                  Text(
+                                    'Nenhum mercado encontrado próximo',
+                                    style: TextStyle(
+                                      color: Colors.grey[600],
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                              ],
+                            );
+                          },
+                        );
+                      },
                     ),
                     const SizedBox(height: 16),
 
@@ -690,6 +794,9 @@ class _ScanPageState extends State<ScanPage> with WidgetsBindingObserver {
                                         'nome': name ?? '',
                                         'descricao': description ?? '',
                                         'mercado': market ?? '',
+                                        'mercadoEndereco':
+                                            selectedMarket.value?['address'] ??
+                                            '',
                                         'categoria':
                                             category?.toLowerCase() ?? 'outros',
                                         'preco': finalPrice.toString(),
