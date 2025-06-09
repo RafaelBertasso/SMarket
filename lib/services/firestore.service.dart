@@ -21,7 +21,6 @@ class FirestoreService {
         'categoria': category.toLowerCase().trim(),
         'mercado': market.trim(),
         'dataAdicionado': FieldValue.serverTimestamp(),
-        'favoritadoPor': [],
       });
     } catch (_) {
       throw Exception('Erro ao adicionar produto ao Firestore');
