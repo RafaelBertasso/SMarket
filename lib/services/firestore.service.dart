@@ -23,7 +23,6 @@ class FirestoreService {
         'mercado': market.trim(),
         'mercadoEndereco': marketAddress.trim(),
         'dataAdicionado': FieldValue.serverTimestamp(),
-        'favoritadoPor': [],
       });
     } catch (_) {
       throw Exception('Erro ao adicionar produto ao Firestore');
