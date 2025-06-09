@@ -29,15 +29,6 @@ class FavoritesPage extends StatelessWidget {
                     .where(FieldPath.documentId, whereIn: favoriteIds.toList())
                     .snapshots(),
             builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(
-                  child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      Colors.deepOrange,
-                    ),
-                  ),
-                );
-              }
 
               if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                 return _buildEmptyState();

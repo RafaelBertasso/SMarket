@@ -12,6 +12,17 @@ class ProductController {
     return ProductModel.fromFirestore(doc);
   }
 
+  Future<void> deleteProduct(String productId) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('produtos')
+          .doc(productId)
+          .delete();
+    } catch (e) {
+      throw Exception('Falha ao deletar produto: $e');
+    }
+  }
+
   String getCategoryImage(String? category) {
     if (category == null) return 'assets/images/default.png';
 

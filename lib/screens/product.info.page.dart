@@ -5,23 +5,206 @@ import 'package:smarket/controllers/product.info.controller.dart';
 import 'package:smarket/models/product.info.model.dart';
 import '../providers/favorites.provider.dart';
 
-class ProductInfoPage extends StatelessWidget {
+class ProductInfoPage extends StatefulWidget {
   ProductInfoPage({super.key, required this.productId});
 
   final String productId;
+
+  @override
+  State<ProductInfoPage> createState() => _ProductInfoPageState();
+}
+
+class _ProductInfoPageState extends State<ProductInfoPage> {
   final ProductController _productController = ProductController();
+  bool _showThankYou = false;
+
+  Future<void> _handlePromotionResponse(bool stillInPromotion, ProductModel product) async {
+    if (stillInPromotion) {
+      setState(() {
+        _showThankYou = true;
+      });
+    } else {
+      final shouldDelete = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Confirmar remoção'),
+          content: const Text('Tem certeza que deseja remover este produto da promoção?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: TextButton.styleFrom(foregroundColor: const Color.fromARGB(255, 201, 13, 0)),
+              child: const Text('Remover'),
+            ),
+          ],
+        ),
+      );
+
+      if (shouldDelete == true) {
+        try {
+          await _productController.deleteProduct(widget.productId);
+          if (mounted) {
+            Navigator.of(context).pop();
+          }
+        } catch (e) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Erro ao remover produto: $e'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        }
+      }
+    }
+  }
+
+  Widget _buildPromotionQuestion(ProductModel product) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.blue[50],
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.blue.shade200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'O produto ainda está em promoção?',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 16),
+          if (_showThankYou)
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.green[50],
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.green.shade200),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.check_circle, color: Colors.green[700]),
+                  const SizedBox(width: 12),
+                  const Text(
+                    'Obrigado pela confirmação!',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          else
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () => _handlePromotionResponse(true, product),
+                    icon: const Icon(Icons.check, color: Colors.white),
+                    label: const Text(
+                      'Sim',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () => _handlePromotionResponse(false, product),
+                    icon: const Icon(Icons.close, color: Colors.white),
+                    label: const Text(
+                      'Não',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoChip({
+    required IconData icon,
+    required String label,
+    required Color color,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withOpacity(0.3), width: 1.5),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 16,
+            color: color,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: TextStyle(
+              color: color,
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: FutureBuilder<ProductModel>(
-        future: _productController.fetchProduct(productId),
+        future: _productController.fetchProduct(widget.productId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
               child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.deepOrange),
+                valueColor: AlwaysStoppedAnimation<Color>(Color.fromARGB(255, 34, 111, 255)),
               ),
             );
           }
@@ -55,7 +238,7 @@ class ProductInfoPage extends StatelessWidget {
 
           final product = snapshot.data!;
           final favoritesProvider = Provider.of<FavoritesProvider>(context);
-          final isFavorited = favoritesProvider.favoriteIds.contains(productId);
+          final isFavorited = favoritesProvider.favoriteIds.contains(widget.productId);
 
           return CustomScrollView(
             slivers: [
@@ -112,7 +295,7 @@ class ProductInfoPage extends StatelessWidget {
                     child: Consumer<FavoritesProvider>(
                       builder: (context, favoritesProvider, _) {
                         final isFavorited = favoritesProvider.favoriteIds
-                            .contains(productId);
+                            .contains(widget.productId);
                         return IconButton(
                           icon: Icon(
                             isFavorited
@@ -121,7 +304,7 @@ class ProductInfoPage extends StatelessWidget {
                             color: Colors.white,
                           ),
                           onPressed: () {
-                            favoritesProvider.toggleFavorite(productId);
+                            favoritesProvider.toggleFavorite(widget.productId);
                           },
                         );
                       },
@@ -176,7 +359,7 @@ class ProductInfoPage extends StatelessWidget {
                               style: const TextStyle(
                                 fontSize: 28,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.deepOrange,
+                                color: Color.fromARGB(255, 29, 227, 39),
                               ),
                             ),
                           ],
@@ -202,13 +385,13 @@ class ProductInfoPage extends StatelessWidget {
                         margin: const EdgeInsets.only(top: 12),
                         child: Row(
                           children: [
-                            buildInfoChip(
+                            _buildInfoChip(
                               icon: Icons.store_outlined,
                               label: product.market ?? 'Mercado',
                               color: Colors.blue,
                             ),
                             const SizedBox(width: 12),
-                            buildInfoChip(
+                            _buildInfoChip(
                               icon: Icons.category_outlined,
                               label: product.category ?? 'Categoria',
                               color: Colors.purple,
@@ -216,6 +399,8 @@ class ProductInfoPage extends StatelessWidget {
                           ],
                         ),
                       ),
+
+                      _buildPromotionQuestion(product),
 
                       if (product.description != null &&
                           product.description!.isNotEmpty)

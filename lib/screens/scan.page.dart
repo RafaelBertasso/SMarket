@@ -444,7 +444,6 @@ class _ScanPageState extends State<ScanPage> with WidgetsBindingObserver {
             'categoria': result['category']?.toLowerCase() ?? 'outros',
             'mercado': result['market'] ?? '',
             'dataAdicionado': FieldValue.serverTimestamp(),
-            'favoritadoPor': [],
           });
 
           ScaffoldMessenger.of(context).showSnackBar(
