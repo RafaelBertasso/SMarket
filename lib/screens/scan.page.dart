@@ -645,68 +645,17 @@ class _ScanPageState extends State<ScanPage> with WidgetsBindingObserver {
                                       );
                                     }),
                                   ],
-                                  onChanged: (newValue) async {
-                                    if (newValue == null) {
-                                      final manualMarket = await showDialog<
-                                        Map<String, dynamic>
-                                      >(
-                                        context: context,
-                                        builder: (context) {
-                                          final textController =
-                                              TextEditingController();
-                                          return AlertDialog(
-                                            title: const Text(
-                                              'Digite o nome do mercado',
-                                            ),
-                                            content: TextField(
-                                              controller: textController,
-                                              decoration: const InputDecoration(
-                                                labelText: 'Nome do mercado',
-                                              ),
-                                            ),
-                                            actions: [
-                                              TextButton(
-                                                onPressed:
-                                                    () =>
-                                                        Navigator.pop(context),
-                                                child: const Text('Cancelar'),
-                                              ),
-                                              TextButton(
-                                                onPressed: () {
-                                                  if (textController
-                                                      .text
-                                                      .isNotEmpty) {
-                                                    Navigator.pop(context, {
-                                                      'name':
-                                                          textController.text,
-                                                      'distance': 0,
-                                                      'location': null,
-                                                    });
-                                                  }
-                                                },
-                                                child: const Text('Confirmar'),
-                                              ),
-                                            ],
-                                          );
-                                        },
-                                      );
-
-                                      if (manualMarket != null) {
-                                        selectedMarket.value = manualMarket;
-                                      }
-                                    } else {
-                                      selectedMarket.value = newValue;
-                                    }
+                                  onChanged: (newValue) {
+                                    selectedMarket.value = newValue;
                                   },
                                   validator:
                                       (value) =>
                                           value == null
                                               ? 'Campo obrigatório'
                                               : null,
-                                  hint: const Text('Selecione um mercado'),
                                   isExpanded: true,
                                 ),
-                                const SizedBox(height: 8),
+
                                 if (markets.isEmpty)
                                   Text(
                                     'Nenhum mercado encontrado próximo',
@@ -788,15 +737,17 @@ class _ScanPageState extends State<ScanPage> with WidgetsBindingObserver {
                                     .toStringAsFixed(2);
 
                                 try {
+                                  final marketName =
+                                      selectedMarket.value?['name'] ?? '';
+                                  final marketAddress =
+                                      selectedMarket.value?['address'] ?? '';
                                   await FirebaseFirestore.instance
                                       .collection('produtos')
                                       .add({
                                         'nome': name ?? '',
                                         'descricao': description ?? '',
-                                        'mercado': market ?? '',
-                                        'mercadoEndereco':
-                                            selectedMarket.value?['address'] ??
-                                            '',
+                                        'mercado': marketName,
+                                        'mercadoEndereco': marketAddress,
                                         'categoria':
                                             category?.toLowerCase() ?? 'outros',
                                         'preco': finalPrice.toString(),

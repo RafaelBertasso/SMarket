@@ -148,76 +148,56 @@ Future<Map<String, dynamic>?> showProductDialog(
                       return ValueListenableBuilder<Map<String, dynamic>?>(
                         valueListenable: selectedMarket,
                         builder: (context, value, child) {
-                          return SingleChildScrollView(
-                            child: Padding(
-                              padding: EdgeInsetsGeometry.all(16),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    margin: const EdgeInsets.only(bottom: 8),
-                                    child: DropdownButtonFormField<
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              DropdownButtonFormField<Map<String, dynamic>>(
+                                value: value,
+                                decoration: InputDecoration(
+                                  labelText: 'Mercado',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  prefixIcon: const Icon(Icons.store),
+                                ),
+                                items: [
+                                  const DropdownMenuItem(
+                                    value: null,
+                                    child: Text('Escolha um mercado'),
+                                  ),
+                                  ...markets.map((market) {
+                                    return DropdownMenuItem<
                                       Map<String, dynamic>
                                     >(
-                                      value: value,
-                                      decoration: InputDecoration(
-                                        labelText: 'Mercado',
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            10,
-                                          ),
-                                        ),
-                                        prefixIcon: const Icon(Icons.store),
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                              horizontal: 16,
-                                              vertical: 14,
-                                            ),
+                                      value: market,
+                                      child: Text(
+                                        '${market['name']} - ${market['address']}',
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
                                       ),
-                                      items: [
-                                        const DropdownMenuItem(
-                                          value: null,
-                                          child: Text('Escolha um mercado'),
-                                        ),
-                                        ...markets.map((market) {
-                                          return DropdownMenuItem<
-                                            Map<String, dynamic>
-                                          >(
-                                            value: market,
-                                            child: Text(
-                                              '${market['name']} - ${market['address']}',
-                                              overflow: TextOverflow.ellipsis,
-                                              maxLines: 1,
-                                            ),
-                                          );
-                                        }),
-                                      ],
-                                      onChanged: (newValue) {
-                                        selectedMarket.value = newValue;
-                                      },
-                                      validator:
-                                          (value) =>
-                                              value == null
-                                                  ? 'Campo obrigatório'
-                                                  : null,
-                                      isExpanded: true,
-                                      dropdownColor: Colors.white,
-                                      elevation: 2,
-                                      icon: const Icon(Icons.arrow_drop_down),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                  if (markets.isEmpty)
-                                    Text(
-                                      'Nenhum mercado encontrado próximo',
-                                      style: TextStyle(
-                                        color: Colors.grey[600],
-                                        fontSize: 12,
-                                      ),
-                                    ),
+                                    );
+                                  }),
                                 ],
+                                onChanged: (newValue) {
+                                  selectedMarket.value = newValue;
+                                },
+                                validator:
+                                    (value) =>
+                                        value == null
+                                            ? 'Campo obrigatório'
+                                            : null,
+                                isExpanded: true,
                               ),
-                            ),
+
+                              if (markets.isEmpty)
+                                Text(
+                                  'Nenhum mercado encontrado próximo',
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: 12,
+                                  ),
+                                ),
+                            ],
                           );
                         },
                       );
@@ -282,18 +262,17 @@ Future<Map<String, dynamic>?> showProductDialog(
                           onPressed: () {
                             if (formKey.currentState!.validate()) {
                               formKey.currentState!.save();
-                              final marketValue =
+                              final marketName =
                                   selectedMarket.value?['name'] ?? '';
-                              final parts = marketValue.split(' - ');
-                              final marketName = parts[0].trim();
                               final marketAddress =
-                                  parts.length > 1 ? parts[1].trim() : '';
+                                  selectedMarket.value?['address'] ?? '';
                               Navigator.pop(context, {
                                 'name': tempName,
                                 'description': tempDescription,
                                 'price': tempPrice,
                                 'category': tempCategory?.toLowerCase(),
-                                'market': '$marketName - $marketAddress',
+                                'market': marketName,
+                                'marketAddress': marketAddress,
                               });
                             }
                           },
