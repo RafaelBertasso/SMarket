@@ -170,7 +170,7 @@ class _ProductInfoPageState extends State<ProductInfoPage> {
       decoration: BoxDecoration(
         color: Colors.transparent,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.3), width: 1.5),
+        border: Border.all(color: color, width: 1.5),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

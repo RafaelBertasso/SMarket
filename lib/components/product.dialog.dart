@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:smarket/controllers/markets.controller.dart';
 import 'package:smarket/models/currency.input.formatter.dart';
 
 Future<Map<String, dynamic>?> showProductDialog(
   BuildContext context, {
+  required MarketsController marketsController,
   required String name,
   required String description,
   required String price,
@@ -13,7 +15,7 @@ Future<Map<String, dynamic>?> showProductDialog(
 }) {
   final formKey = GlobalKey<FormState>();
   final priceController = TextEditingController(text: price);
-  final marketController = TextEditingController(text: market);
+  ValueNotifier<Map<String, dynamic>?> selectedMarket = ValueNotifier(null);
 
   final List<String> categories = [
     'Açougue',
@@ -117,21 +119,89 @@ Future<Map<String, dynamic>?> showProductDialog(
                   ),
                   const SizedBox(height: 16),
 
-                  TextFormField(
-                    controller: marketController,
-                    decoration: InputDecoration(
-                      labelText: 'Mercado',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      prefixIcon: const Icon(Icons.store),
-                    ),
-                    onSaved: (value) => tempMarket = value ?? '',
-                    validator:
-                        (value) =>
-                            value == null || value.isEmpty
-                                ? 'Campo obrigatório'
-                                : null,
+                  FutureBuilder<List<Map<String, dynamic>>>(
+                    future: marketsController.getNearbyMarkets(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+
+                      final markets = snapshot.data ?? [];
+
+                      if (market.isNotEmpty && markets.isNotEmpty) {
+                        final existingMarket = markets.firstWhere(
+                          (m) => m['name'] == market,
+                          orElse: () => {},
+                        );
+
+                        if (existingMarket.isNotEmpty) {
+                          selectedMarket.value = existingMarket;
+                        } else {
+                          markets.insert(0, {
+                            'name': market,
+                            'distance': 0,
+                            'location': null,
+                          });
+                        }
+                      }
+
+                      return ValueListenableBuilder<Map<String, dynamic>?>(
+                        valueListenable: selectedMarket,
+                        builder: (context, value, child) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              DropdownButtonFormField<Map<String, dynamic>>(
+                                value: value,
+                                decoration: InputDecoration(
+                                  labelText: 'Mercado',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  prefixIcon: const Icon(Icons.store),
+                                ),
+                                items: [
+                                  const DropdownMenuItem(
+                                    value: null,
+                                    child: Text('Escolha um mercado'),
+                                  ),
+                                  ...markets.map((market) {
+                                    return DropdownMenuItem<
+                                      Map<String, dynamic>
+                                    >(
+                                      value: market,
+                                      child: Text(
+                                        '${market['name']} - ${market['address']}',
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                      ),
+                                    );
+                                  }),
+                                ],
+                                onChanged: (newValue) {
+                                  selectedMarket.value = newValue;
+                                },
+                                validator:
+                                    (value) =>
+                                        value == null
+                                            ? 'Campo obrigatório'
+                                            : null,
+                                isExpanded: true,
+                              ),
+
+                              if (markets.isEmpty)
+                                Text(
+                                  'Nenhum mercado encontrado próximo',
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: 12,
+                                  ),
+                                ),
+                            ],
+                          );
+                        },
+                      );
+                    },
                   ),
                   const SizedBox(height: 16),
 
@@ -192,12 +262,17 @@ Future<Map<String, dynamic>?> showProductDialog(
                           onPressed: () {
                             if (formKey.currentState!.validate()) {
                               formKey.currentState!.save();
+                              final marketName =
+                                  selectedMarket.value?['name'] ?? '';
+                              final marketAddress =
+                                  selectedMarket.value?['address'] ?? '';
                               Navigator.pop(context, {
                                 'name': tempName,
                                 'description': tempDescription,
                                 'price': tempPrice,
                                 'category': tempCategory?.toLowerCase(),
-                                'market': tempMarket,
+                                'market': marketName,
+                                'marketAddress': marketAddress,
                               });
                             }
                           },

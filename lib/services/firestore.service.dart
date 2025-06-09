@@ -10,6 +10,7 @@ class FirestoreService {
     required String price,
     required String category,
     required String market,
+    required String marketAddress,
   }) async {
     try {
       final nameLower = name.toLowerCase();
@@ -20,13 +21,15 @@ class FirestoreService {
         'preco': price.trim(),
         'categoria': category.toLowerCase().trim(),
         'mercado': market.trim(),
+        'mercadoEndereco': marketAddress.trim(),
         'dataAdicionado': FieldValue.serverTimestamp(),
       });
     } catch (_) {
       throw Exception('Erro ao adicionar produto ao Firestore');
     }
   }
-  Future<QuerySnapshot> searchProducts(String query) async{
+
+  Future<QuerySnapshot> searchProducts(String query) async {
     final searchTerm = query.toLowerCase().trim();
     if (searchTerm.isEmpty) {
       return await productsCollection.limit(1).get();

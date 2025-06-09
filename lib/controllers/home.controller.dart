@@ -63,22 +63,23 @@ class HomeController {
   }
 
   Future<Map<String, dynamic>?> searchProducts(String productName) async {
-    try {
-      final result = await _firestoreService.searchProducts(productName);
-      if (result.docs.isNotEmpty) {
-        final doc = result.docs.first;
-        final data = doc.data() as Map<String, dynamic>;
+    final snapshot =
+        await FirebaseFirestore.instance.collection('produtos').get();
 
-        return {
-          'id': doc.id,
-          'nome': data['nome'],
-          'categoria': data['categoria'],
-          'data': data,
-        };
-      }
-      return null;
-    } catch (_) {
-      throw Exception('Erro ao buscar produtos');
+    final doc = snapshot.docs.firstWhere(
+      (doc) => (doc['nome'] as String).toLowerCase().contains(
+        productName.toLowerCase(),
+      ),
+    );
+
+    if (doc != null) {
+      return {
+        'id': doc.id,
+        'nome': doc['nome'],
+        'categoria': doc['categoria'],
+        'data': doc.data(),
+      };
     }
+    return null;
   }
 }
