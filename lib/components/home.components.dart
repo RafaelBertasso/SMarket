@@ -32,7 +32,11 @@ Widget buildHeader() {
   );
 }
 
-Widget buildSearchField(BuildContext context, HomeController controller) {
+Widget buildSearchField(
+  BuildContext context,
+  HomeController controller,
+  TextEditingController searchController,
+) {
   final searchController = TextEditingController();
 
   return Container(
@@ -71,7 +75,7 @@ Widget buildSearchField(BuildContext context, HomeController controller) {
 
                 if (result != null &&
                     result.isNotEmpty &&
-                    result['categoria'] != null) {
+                    result['category'] != null) {
                   Navigator.pushNamed(
                     context,
                     '/category',
@@ -83,7 +87,7 @@ Widget buildSearchField(BuildContext context, HomeController controller) {
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Produto "$value" não encontrado'),
+                      content: Text('Produto não encontrado'),
                       duration: const Duration(seconds: 2),
                     ),
                   );
@@ -97,6 +101,7 @@ Widget buildSearchField(BuildContext context, HomeController controller) {
                   ),
                 );
               }
+              searchController.clear();
             },
           ),
         ),
@@ -249,7 +254,10 @@ Widget buildRecentProductsSection(
                       scrollDirection: Axis.horizontal,
                       itemCount: filteredProducts.length,
                       itemBuilder: (context, index) {
-                        return _buildRecentProductCard(context, filteredProducts[index]);
+                        return _buildRecentProductCard(
+                          context,
+                          filteredProducts[index],
+                        );
                       },
                     ),
                   );
@@ -273,9 +281,7 @@ Widget _buildErrorWidget(String message) {
 Widget _buildRecentProductCard(BuildContext context, Product product) {
   final diff = DateTime.now().difference(product.dataAdicionado);
   final tempoDecorrido =
-      diff.inHours > 0
-          ? 'Há ${diff.inHours}h'
-          : 'Há ${diff.inMinutes}min';
+      diff.inHours > 0 ? 'Há ${diff.inHours}h' : 'Há ${diff.inMinutes}min';
 
   return Container(
     width: 260,
@@ -283,161 +289,177 @@ Widget _buildRecentProductCard(BuildContext context, Product product) {
     child: Material(
       elevation: 3,
       borderRadius: BorderRadius.circular(16),
-      shadowColor: Colors.black.withOpacity(0.1),
+      shadowColor: const Color.fromARGB(39, 0, 0, 0),
       child: InkWell(
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ProductInfoPage(productId: product.id),
-          ),
-        ),
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.white,
-                Colors.grey.shade50,
-              ],
+        onTap:
+            () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ProductInfoPage(productId: product.id),
+              ),
             ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header with time badge
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.green.shade50,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: Colors.green.shade200,
-                          width: 1,
+        borderRadius: BorderRadius.circular(16),
+        child: SingleChildScrollView(
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Colors.white, Colors.grey.shade50],
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
                         ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.access_time,
-                            size: 12,
-                            color: Colors.green.shade700,
+                        decoration: BoxDecoration(
+                          color: Colors.green.shade50,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.green.shade200,
+                            width: 1,
                           ),
-                          const SizedBox(width: 4),
-                          Text(
-                            tempoDecorrido,
-                            style: GoogleFonts.inter(
-                              fontSize: 10,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.access_time,
+                              size: 12,
                               color: Colors.green.shade700,
-                              fontWeight: FontWeight.w600,
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.blue.shade50,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        product.mercado,
-                        style: GoogleFonts.inter(
-                          fontSize: 11,
-                          color: Colors.blue.shade700,
-                          fontWeight: FontWeight.w500,
+                            const SizedBox(width: 4),
+                            Text(
+                              tempoDecorrido,
+                              style: GoogleFonts.inter(
+                                fontSize: 10,
+                                color: Colors.green.shade700,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                
-                const SizedBox(height: 12),
-                
-                // Product name
-                Text(
-                  product.nome,
-                  style: GoogleFonts.inter(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15,
-                    color: Colors.black87,
-                    height: 1.2,
+                      Flexible(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.blue.shade50,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                product.mercado,
+                                style: GoogleFonts.inter(
+                                  fontSize: 11,
+                                  color: Colors.blue.shade700,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              SizedBox(height: 2),
+                              Text(
+                                product.mercadoEndereco,
+                                style: GoogleFonts.inter(
+                                  fontSize: 11,
+                                  color: Colors.blue.shade700,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                
-                const SizedBox(height: 8),
-                
-                // Description
-                if (product.descricao != null && product.descricao!.isNotEmpty) ...[
+
+                  const SizedBox(height: 12),
+
+                  // Product name
                   Text(
-                    product.descricao!,
+                    product.nome,
                     style: GoogleFonts.inter(
-                      fontSize: 13,
-                      color: Colors.grey[600],
-                      height: 1.3,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                      color: Colors.black87,
+                      height: 1.2,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 12),
-                ],
-                
-                // Price section
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.green.shade50,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: Colors.green.shade100,
-                      width: 1,
+
+                  const SizedBox(height: 8),
+
+                  // Description
+                  if (product.descricao != null &&
+                      product.descricao!.isNotEmpty) ...[
+                    Text(
+                      product.descricao!,
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        color: Colors.grey[600],
+                        height: 1.3,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+
+                  // Price section
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade50,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: Colors.green.shade100,
+                        width: 1,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            'R\$ ${product.preco.toStringAsFixed(2).replaceAll('.', ',')}',
+                            style: GoogleFonts.inter(
+                              color: Colors.green.shade700,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        Icon(
+                          Icons.arrow_forward_ios,
+                          size: 12,
+                          color: Colors.green.shade600,
+                        ),
+                      ],
                     ),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Flexible(
-                        child: Text(
-                          'R\$ ${product.preco.toStringAsFixed(2).replaceAll('.', ',')}',
-                          style: GoogleFonts.inter(
-                            color: Colors.green.shade700,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      Icon(
-                        Icons.arrow_forward_ios,
-                        size: 12,
-                        color: Colors.green.shade600,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

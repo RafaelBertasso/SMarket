@@ -162,9 +162,10 @@ class _ScanPageState extends State<ScanPage> with WidgetsBindingObserver {
         title: Text(
           'Escaneie o Produto',
           style: GoogleFonts.inter(
-            fontSize: 16,
-            fontWeight: FontWeight.normal,
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
             color: Colors.white,
+            
           ),
         ),
       ),
@@ -602,12 +603,6 @@ class _ScanPageState extends State<ScanPage> with WidgetsBindingObserver {
 
                           if (existingMarket.isNotEmpty) {
                             selectedMarket.value = existingMarket;
-                          } else {
-                            markets.insert(0, {
-                              'name': market,
-                              'distance': 0,
-                              'location': null,
-                            });
                           }
                         }
 

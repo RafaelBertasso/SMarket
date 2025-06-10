@@ -23,13 +23,16 @@ class _CategoryPageState extends State<CategoryPage> {
 
   @override
   Widget build(BuildContext context) {
+    final routeArgs =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final String? highlightProductId = routeArgs?['highlightProduct'];
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
         centerTitle: true,
         title: Text(
           widget.categoryName,
-          style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.w700),
         ),
       ),
       body: Column(
@@ -72,7 +75,10 @@ class _CategoryPageState extends State<CategoryPage> {
                 return ListView.builder(
                   itemCount: products.length,
                   itemBuilder: (context, index) {
-                    return _buildProductItem(products[index]);
+                    return _buildProductItem(
+                      products[index],
+                      highlightProductId: highlightProductId,
+                    );
                   },
                 );
               },
@@ -98,11 +104,31 @@ class _CategoryPageState extends State<CategoryPage> {
     return query.snapshots();
   }
 
-  Widget _buildProductItem(DocumentSnapshot doc) {
+  Widget _buildProductItem(DocumentSnapshot doc, {String? highlightProductId}) {
     final product = doc.data() as Map<String, dynamic>;
+    final isHighlighted = doc.id == highlightProductId;
 
-    return Card(
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 400),
+      curve: Curves.easeInOut,
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: isHighlighted ? Colors.yellow[100] : null,
+        borderRadius: BorderRadius.circular(8),
+        border:
+            isHighlighted ? Border.all(color: Colors.orange, width: 2) : null,
+        boxShadow:
+            isHighlighted
+                ? [
+                  BoxShadow(
+                    color: Color.fromARGB(74, 255, 153, 0),
+                    blurRadius: 12,
+                    offset: Offset(0, 4),
+                  ),
+                ]
+                : null,
+      ),
+
       child: ListTile(
         leading: CircleAvatar(
           backgroundImage:
@@ -117,7 +143,7 @@ class _CategoryPageState extends State<CategoryPage> {
         title: Text(product['nome']),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [Text('R\$ ${product['preco']}'), Text(product['mercado'])],
+          children: [Text('R\$ ${product['preco']}'), Text('${product['mercado']} - ${product['mercadoEndereco']}')],
         ),
         trailing: Consumer<FavoritesProvider>(
           builder: (context, favoritesProvider, _) {

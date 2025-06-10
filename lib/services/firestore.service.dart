@@ -13,10 +13,10 @@ class FirestoreService {
     required String marketAddress,
   }) async {
     try {
-      final nameLower = name.toLowerCase();
+      final nameLower = name.toLowerCase().split(' ');
       await productsCollection.add({
         'nome': name.trim(),
-        'nomeLower': nameLower.trim(),
+        'nomeLower': nameLower,
         'descricao': description.trim(),
         'preco': price.trim(),
         'categoria': category.toLowerCase().trim(),
@@ -35,8 +35,7 @@ class FirestoreService {
       return await productsCollection.limit(1).get();
     }
     return productsCollection
-        .where('nomeLower', isGreaterThanOrEqualTo: searchTerm)
-        .where('nomeLower', isLessThanOrEqualTo: '$searchTerm\uf8ff')
+        .where('nomeLower', arrayContains: searchTerm)
         .limit(10)
         .get();
   }

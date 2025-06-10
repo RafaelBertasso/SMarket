@@ -24,15 +24,16 @@ class _ProfilePageState extends State<ProfilePage> {
       backgroundColor: Colors.white,
 
       appBar: AppBar(
+        centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'Dados Pessoais',
-          style: GoogleFonts.inter(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
+          style: GoogleFonts.poppins(
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
             color: Colors.black,
           ),
         ),
@@ -44,77 +45,121 @@ class _ProfilePageState extends State<ProfilePage> {
           user == null
               ? const Center(child: Text('Usuário não encontrado.'))
               : SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const SizedBox(height: 10),
-                    const CircleAvatar(
-                      radius: 45,
-                      backgroundColor: Color.fromRGBO(211, 233, 248, 1),
-                      child: Icon(
-                        Icons.person_rounded,
-                        color: Colors.white,
-                        size: 50,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Nome',
-                        style: GoogleFonts.inter(
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey[600],
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 6),
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 14,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color.fromRGBO(245, 245, 245, 1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        user!.displayName ?? 'Sem nome cadastrado',
-                        style: GoogleFonts.inter(fontSize: 16),
+                      padding: const EdgeInsets.only(top: 48, bottom: 24),
+                      decoration: const BoxDecoration(),
+                      child: Column(
+                        children: [
+                          CircleAvatar(
+                            radius: 48,
+                            backgroundColor: Color.fromARGB(255, 211, 233, 248),
+                            child: Icon(
+                              Icons.person_rounded,
+                              color: Color.fromRGBO(255, 255, 255, 1),
+                              size: 50,
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+                          Text(
+                            user!.displayName ?? 'Sem nome cadastrado',
+                            style: GoogleFonts.inter(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            user!.email ?? 'Sem e-mail',
+                            style: GoogleFonts.inter(
+                              color: Colors.grey[700],
+                              fontSize: 15,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-
-                    const SizedBox(height: 24),
-
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'E-mail',
-                        style: GoogleFonts.inter(
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey[600],
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Container(
-                      width: double.infinity,
+                    // Cards com informações
+                    Padding(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 14,
+                        horizontal: 24,
+                        vertical: 24,
                       ),
-                      decoration: BoxDecoration(
-                        color: const Color.fromRGBO(245, 245, 245, 1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        user!.email ?? 'Sem e-mail',
-                        style: GoogleFonts.inter(fontSize: 16),
+                      child: Column(
+                        children: [
+                          Card(
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: ListTile(
+                              leading: const Icon(
+                                Icons.person_outline_rounded,
+                                color: Colors.blueGrey,
+                              ),
+                              title: Text(
+                                'Nome',
+                                style: GoogleFonts.inter(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              subtitle: Text(
+                                user!.displayName ?? 'Sem nome cadastrado',
+                                style: GoogleFonts.inter(fontSize: 16),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Card(
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: ListTile(
+                              leading: const Icon(
+                                Icons.email_outlined,
+                                color: Colors.blueGrey,
+                              ),
+                              title: Text(
+                                'E-mail',
+                                style: GoogleFonts.inter(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              subtitle: Text(
+                                user!.email ?? 'Sem e-mail',
+                                style: GoogleFonts.inter(fontSize: 16),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Card(
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: ListTile(
+                              leading: const Icon(
+                                Icons.calendar_today_rounded,
+                                color: Colors.blueGrey,
+                              ),
+                              title: Text(
+                                'Conta criada em',
+                                style: GoogleFonts.inter(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              subtitle: Text(
+                                user!.metadata.creationTime != null
+                                    ? '${user!.metadata.creationTime!.day.toString().padLeft(2, '0')}/${user!.metadata.creationTime!.month.toString().padLeft(2, '0')}/${user!.metadata.creationTime!.year}'
+                                    : 'Desconhecido',
+                                style: GoogleFonts.inter(fontSize: 16),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
