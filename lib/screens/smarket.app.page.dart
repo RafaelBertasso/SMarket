@@ -5,6 +5,7 @@ import 'package:smarket/screens/category.page.dart';
 import 'package:smarket/screens/favorites.page.dart';
 import 'package:smarket/screens/forgot.password.page.dart';
 import 'package:smarket/screens/login.page.dart';
+import 'package:smarket/screens/permissions.page.dart';
 import 'package:smarket/screens/register.page.dart';
 import 'package:smarket/screens/profile.page.dart';
 import 'package:smarket/screens/location.page.dart';
@@ -24,6 +25,7 @@ class SMarketApp extends StatelessWidget {
         '/forgot-password': (context) => ForgotPasswordPage(),
         '/profile': (context) => ProfilePage(),
         '/location': (context) => LocationPage(),
+        '/permissions': (context) => PermissionsPage(),
         '/category': (context) {
           final args =
               ModalRoute.of(context)!.settings.arguments

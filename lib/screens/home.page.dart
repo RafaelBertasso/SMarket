@@ -7,6 +7,7 @@ import 'package:smarket/controllers/home.controller.dart';
 class HomePage extends StatelessWidget {
   HomePage({super.key});
   final HomeController controller = HomeController();
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +32,7 @@ class HomePage extends StatelessWidget {
                 children: [
                   buildHeader(),
                   const SizedBox(height: 24),
-                  buildSearchField(context, controller),
+                  buildSearchField(context, controller, _searchController),
                   const SizedBox(height: 24),
                   buildCategoriesSection(context, controller),
                 ],

@@ -66,20 +66,20 @@ class HomeController {
     final snapshot =
         await FirebaseFirestore.instance.collection('produtos').get();
 
-    final doc = snapshot.docs.firstWhere(
-      (doc) => (doc['nome'] as String).toLowerCase().contains(
-        productName.toLowerCase(),
-      ),
-    );
-
-    if (doc != null) {
+    try {
+      final doc = snapshot.docs.firstWhere(
+        (doc) => (doc['nome'] as String).toLowerCase().contains(
+          productName.toLowerCase(),
+        ),
+      );
       return {
         'id': doc.id,
         'nome': doc['nome'],
-        'categoria': doc['categoria'],
+        'category': doc['categoria'],
         'data': doc.data(),
       };
+    } catch (e) {
+      return null;
     }
-    return null;
   }
 }

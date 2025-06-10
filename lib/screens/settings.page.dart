@@ -14,64 +14,12 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _cameraEnabled = false;
   bool _locationEnabled = false;
 
-
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final user = FirebaseAuth.instance.currentUser;
 
   @override
   void initState() {
     super.initState();
-    _checkCameraPermission();
-    _checkLocationPermission();
-  }
-
-  Future<void> _checkCameraPermission() async {
-    final status = await Permission.camera.status;
-    setState(() {
-      _cameraEnabled = status.isGranted;
-    });
-  }
-
-  Future<void> _toggleCamera(bool value) async {
-    if (value) {
-      final status = await Permission.camera.request();
-      if (status.isDenied) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Permissão de câmera negada')));
-      }
-    } else {
-      await Permission.camera.request();
-      await Permission.camera.shouldShowRequestRationale;
-    }
-    setState(() async {
-      _cameraEnabled = value && (await Permission.camera.status).isGranted;
-    });
-  }
-
-  Future<void> _checkLocationPermission() async {
-    final status = await Permission.location.status;
-    setState(() {
-      _locationEnabled = status.isGranted;
-    });
-  }
-
-  Future<void> _toggleLocation(bool value) async {
-    if (value) {
-      final status = await Permission.location.request();
-      if (status.isDenied) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Permissão de localização negada')),
-        );
-      }
-    } else {
-      await Permission.location.request();
-      await Permission.location.shouldShowRequestRationale;
-    }
-
-    setState(() async {
-      _locationEnabled = value && (await Permission.location.status).isGranted;
-    });
   }
 
   void _deleteAccount() async {
@@ -125,7 +73,7 @@ class _SettingsPageState extends State<SettingsPage> {
         centerTitle: true,
         title: Text(
           'Meu Perfil',
-          style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.w700),
         ),
       ),
 
@@ -139,7 +87,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   padding: const EdgeInsets.all(2),
                   child: const CircleAvatar(
                     radius: 50,
-                    backgroundColor: Color.fromRGBO(211, 233, 248, 1),
+                    backgroundColor: Color.fromARGB(255, 211, 233, 248),
                     child: Icon(
                       Icons.person_rounded,
                       color: Colors.white,
@@ -175,7 +123,7 @@ class _SettingsPageState extends State<SettingsPage> {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'Configurações',
+                  'Permissões',
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     color: Colors.grey[600],
@@ -184,17 +132,11 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               ),
             ),
-            _buildToggleItem(
-              Icons.camera_alt_outlined,
-              'Permitir o Uso da Câmera',
-              _cameraEnabled,
-              _toggleCamera,
-            ),
-            _buildToggleItem(
-              Icons.place_outlined,
-              'Permitir o Uso da Localização',
-              _locationEnabled,
-              _toggleLocation,
+            _buildMenuItem(
+              context,
+              Icons.lock_outline_rounded,
+              'Permissões',
+              '/permissions',
             ),
 
             Padding(

@@ -18,7 +18,10 @@ class _ProductInfoPageState extends State<ProductInfoPage> {
   final ProductController _productController = ProductController();
   bool _showThankYou = false;
 
-  Future<void> _handlePromotionResponse(bool stillInPromotion, ProductModel product) async {
+  Future<void> _handlePromotionResponse(
+    bool stillInPromotion,
+    ProductModel product,
+  ) async {
     if (stillInPromotion) {
       setState(() {
         _showThankYou = true;
@@ -26,21 +29,26 @@ class _ProductInfoPageState extends State<ProductInfoPage> {
     } else {
       final shouldDelete = await showDialog<bool>(
         context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Confirmar remoção'),
-          content: const Text('Tem certeza que deseja remover este produto da promoção?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancelar'),
+        builder:
+            (context) => AlertDialog(
+              title: const Text('Confirmar remoção'),
+              content: const Text(
+                'Tem certeza que deseja remover este produto da promoção?',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text('Cancelar'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  style: TextButton.styleFrom(
+                    foregroundColor: const Color.fromARGB(255, 201, 13, 0),
+                  ),
+                  child: const Text('Remover'),
+                ),
+              ],
             ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              style: TextButton.styleFrom(foregroundColor: const Color.fromARGB(255, 201, 13, 0)),
-              child: const Text('Remover'),
-            ),
-          ],
-        ),
       );
 
       if (shouldDelete == true) {
@@ -96,12 +104,14 @@ class _ProductInfoPageState extends State<ProductInfoPage> {
                 children: [
                   Icon(Icons.check_circle, color: Colors.green[700]),
                   const SizedBox(width: 12),
-                  const Text(
-                    'Obrigado pela confirmação!',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black87,
+                  Expanded(
+                    child: const Text(
+                      'Obrigado pela confirmação!',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black87,
+                      ),
                     ),
                   ),
                 ],
@@ -175,11 +185,7 @@ class _ProductInfoPageState extends State<ProductInfoPage> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            size: 16,
-            color: color,
-          ),
+          Icon(icon, size: 16, color: color),
           const SizedBox(width: 6),
           Text(
             label,
@@ -204,7 +210,9 @@ class _ProductInfoPageState extends State<ProductInfoPage> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
               child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Color.fromARGB(255, 34, 111, 255)),
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  Color.fromARGB(255, 34, 111, 255),
+                ),
               ),
             );
           }
@@ -238,7 +246,9 @@ class _ProductInfoPageState extends State<ProductInfoPage> {
 
           final product = snapshot.data!;
           final favoritesProvider = Provider.of<FavoritesProvider>(context);
-          final isFavorited = favoritesProvider.favoriteIds.contains(widget.productId);
+          final isFavorited = favoritesProvider.favoriteIds.contains(
+            widget.productId,
+          );
 
           return CustomScrollView(
             slivers: [
@@ -385,10 +395,14 @@ class _ProductInfoPageState extends State<ProductInfoPage> {
                         margin: const EdgeInsets.only(top: 12),
                         child: Row(
                           children: [
-                            _buildInfoChip(
-                              icon: Icons.store_outlined,
-                              label: product.market ?? 'Mercado',
-                              color: Colors.blue,
+                            Column(
+                              children: [
+                                _buildInfoChip(
+                                  icon: Icons.store_outlined,
+                                  label: product.market ?? 'Mercado',
+                                  color: Colors.blue,
+                                ),
+                              ],
                             ),
                             const SizedBox(width: 12),
                             _buildInfoChip(

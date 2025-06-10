@@ -17,18 +17,21 @@ class LocationPage extends StatefulWidget {
 
 class _LocationPageState extends State<LocationPage> {
   final MarketsController _controller = MarketsController();
+  late TextEditingController _searchController;
 
   @override
   void initState() {
     super.initState();
     _controller.initialize();
     _controller.addListener(_handleStateChange);
+    _searchController = TextEditingController();
   }
 
   @override
   void dispose() {
     _controller.removeListener(_handleStateChange);
     _controller.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -52,7 +55,7 @@ class _LocationPageState extends State<LocationPage> {
         centerTitle: true,
         title: Text(
           'Encontre mercados',
-          style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.w600),
+          style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.w700),
         ),
       ),
       body: Stack(
@@ -156,6 +159,24 @@ class _LocationPageState extends State<LocationPage> {
                               )
                               .toList();
                         },
+                        fieldViewBuilder: (
+                          context,
+                          textEditingController,
+                          focusNode,
+                          onFieldSubmitted,
+                        ) {
+                          _searchController = textEditingController;
+                          return TextField(
+                            controller: textEditingController,
+                            focusNode: focusNode,
+                            onSubmitted: (value) => onFieldSubmitted(),
+                            decoration: InputDecoration(
+                              hintText: 'Pesquise por um mercado',
+                              border: InputBorder.none,
+                            ),
+                            style: GoogleFonts.inter(),
+                          );
+                        },
                         onSelected: (String selectedOption) async {
                           final selectedMarket = _controller.state.markets
                               .firstWhere(
@@ -198,6 +219,7 @@ class _LocationPageState extends State<LocationPage> {
                                   ],
                                 ),
                           );
+                          _searchController.clear();
                         },
                       ),
                     ),
